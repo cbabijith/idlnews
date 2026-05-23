@@ -2,26 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+  body {
+    @apply bg-background text-on-surface antialiased;
+    min-height: max(884px, 100dvh);
+  }
+  
+  /* HTML content styling */
+  article strong, article b {
+    @apply font-bold;
+  }
+  
+  article em, article i {
+    @apply italic;
+  }
+  
+  article ul, article ol {
+    @apply list-inside my-4;
+  }
+  
+  article ul {
+    @apply list-disc;
+  }
+  
+  article ol {
+    @apply list-decimal;
+  }
+  
+  article li {
+    @apply my-2;
+  }
+  
+  article p {
+    @apply my-4;
+  }
+  
+  article a {
+    @apply text-primary underline;
+  }
+  
+  article blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-4;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer utilities {
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    padding-right: 100%;
+    animation: ticker 20s linear infinite;
+  }
+  
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+    min-width: 100%;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+  }
+  
+  @keyframes ticker {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

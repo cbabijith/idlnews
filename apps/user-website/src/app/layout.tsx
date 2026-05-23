@@ -1,8 +1,18 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Archivo_Narrow, Be_Vietnam_Pro } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const archivoNarrow = Archivo_Narrow({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-archivo-narrow',
+})
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-be-vietnam-pro',
+})
 
 export const metadata: Metadata = {
   title: 'SNG News - User Website',
@@ -16,7 +26,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+      </head>
+      <body className={`${archivoNarrow.variable} ${beVietnamPro.variable}`}>{children}</body>
     </html>
   )
 }
