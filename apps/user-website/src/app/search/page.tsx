@@ -23,6 +23,15 @@ interface NewsItem {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. Please try again.')), ms)
+    )
+  ]);
+}
+
 function SearchContent() {
   const { colors } = useThemeStore()
   const searchParams = useSearchParams()
@@ -30,7 +39,9 @@ function SearchContent() {
   const [searchQuery, setSearchQuery] = useState(query)
   const [results, setResults] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [retryTrigger, setRetryTrigger] = useState(0)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -54,20 +65,27 @@ function SearchContent() {
       }
 
       setLoading(true)
+      setError(null)
       setShowDropdown(true)
       try {
-        const { data, error } = await supabase
-          .from('news')
-          .select('id, title, content, image_url, published_at, categories(name, slug), profiles(full_name)')
-          .eq('is_published', true)
-          .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
-          .order('published_at', { ascending: false })
-          .limit(10)
+        const { data, error } = await withTimeout(
+          Promise.resolve(
+            supabase
+              .from('news')
+              .select('id, title, content, image_url, published_at, categories(name, slug), profiles(full_name)')
+              .eq('is_published', true)
+              .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
+              .order('published_at', { ascending: false })
+              .limit(10)
+          ),
+          8000
+        )
 
         if (error) throw error
         setResults(data as unknown as NewsItem[])
       } catch (err) {
         console.error('Search failed:', err)
+        setError(err instanceof Error ? err.message : 'Search failed. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -75,7 +93,7 @@ function SearchContent() {
 
     const timer = setTimeout(searchNews, 300)
     return () => clearTimeout(timer)
-  }, [searchQuery])
+  }, [searchQuery, retryTrigger])
 
   return (
     <div className={`min-h-screen ${colors.background} pb-[80px] md:pb-0`}>
@@ -119,19 +137,31 @@ function SearchContent() {
                 </div>
               )}
 
-              {!loading && searchQuery && results.length === 0 && (
+              {error && (
+                <div className="text-center py-8 px-4">
+                  <p className="text-error mb-2 text-sm">{error}</p>
+                  <button 
+                    onClick={() => setRetryTrigger(prev => prev + 1)}
+                    className="px-4 py-1.5 bg-button text-on-primary rounded-lg text-xs font-medium hover:opacity-90 transition-all shadow-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {!loading && !error && searchQuery && results.length === 0 && (
                 <div className="text-center py-8">
                   <p className="text-on-surface-variant">No results found for "{searchQuery}"</p>
                 </div>
               )}
 
-              {!loading && !searchQuery && (
+              {!loading && !error && !searchQuery && (
                 <div className="text-center py-8">
                   <p className="text-on-surface-variant">Enter a search term to find news</p>
                 </div>
               )}
 
-              {!loading && results.length > 0 && (
+              {!loading && !error && results.length > 0 && (
                 <div className="p-2">
                   <p className="text-on-surface-variant text-xs px-3 py-2">
                     Found {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"

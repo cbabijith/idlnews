@@ -35,6 +35,15 @@ interface NewsItem {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. The database might be waking up or your network is slow. Please try again.')), ms)
+    )
+  ])
+}
+
 export default function Home() {
   const { colors } = useThemeStore()
   const [categories, setCategories] = useState<Category[]>([])
@@ -43,15 +52,21 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [retryTrigger, setRetryTrigger] = useState(0)
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true)
+      setError(null)
       try {
-        const [categoriesRes, pinnedRes, recentRes] = await Promise.all([
-          supabase.from('categories').select('*').order('name'),
-          supabase.from('news').select('*, categories(name, slug), profiles(full_name, email)').eq('is_published', true).eq('is_pinned', true).order('published_at', { ascending: false }).limit(5),
-          supabase.from('news').select('*, categories(name, slug), profiles(full_name, email)').eq('is_published', true).eq('is_pinned', false).order('published_at', { ascending: false }).limit(10)
-        ])
+        const [categoriesRes, pinnedRes, recentRes] = await withTimeout(
+          Promise.all([
+            supabase.from('categories').select('*').order('name'),
+            supabase.from('news').select('*, categories(name, slug), profiles(full_name, email)').eq('is_published', true).eq('is_pinned', true).order('published_at', { ascending: false }).limit(5),
+            supabase.from('news').select('*, categories(name, slug), profiles(full_name, email)').eq('is_published', true).eq('is_pinned', false).order('published_at', { ascending: false }).limit(10)
+          ]),
+          8000
+        )
 
         if (categoriesRes.error) throw categoriesRes.error
         if (pinnedRes.error) throw pinnedRes.error
@@ -68,7 +83,7 @@ export default function Home() {
     }
 
     fetchData()
-  }, [])
+  }, [retryTrigger])
 
   useEffect(() => {
     async function fetchFilteredNews() {
@@ -126,8 +141,14 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-error">Error: {error}</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-center">
+        <p className="text-error mb-4 font-medium max-w-md">{error}</p>
+        <button
+          onClick={() => setRetryTrigger(prev => prev + 1)}
+          className="px-6 py-2.5 bg-button text-on-primary rounded-lg font-medium hover:opacity-90 transition-all shadow-md"
+        >
+          Retry Loading
+        </button>
       </div>
     )
   }

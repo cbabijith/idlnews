@@ -26,6 +26,15 @@ interface NewsItem {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out. The database might be waking up or your network is slow. Please try again.')), ms)
+    )
+  ]);
+}
+
 export default function NewsDetailPage() {
   const { colors } = useThemeStore()
   const params = useParams()
@@ -33,16 +42,24 @@ export default function NewsDetailPage() {
   const [news, setNews] = useState<NewsItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [retryTrigger, setRetryTrigger] = useState(0)
 
   useEffect(() => {
     async function fetchNews() {
+      setLoading(true)
+      setError(null)
       try {
-        const { data, error } = await supabase
-          .from('news')
-          .select('id, title, content, description, image_url, youtube_link, published_at, is_pinned, categories(name, slug), profiles(full_name)')
-          .eq('id', params.id)
-          .eq('is_published', true)
-          .single()
+        const { data, error } = await withTimeout(
+          Promise.resolve(
+            supabase
+              .from('news')
+              .select('id, title, content, description, image_url, youtube_link, published_at, is_pinned, categories(name, slug), profiles(full_name)')
+              .eq('id', params.id)
+              .eq('is_published', true)
+              .single()
+          ),
+          8000
+        )
 
         if (error) throw error
         setNews(data as unknown as NewsItem)
@@ -56,7 +73,7 @@ export default function NewsDetailPage() {
     if (params.id) {
       fetchNews()
     }
-  }, [params.id])
+  }, [params.id, retryTrigger])
 
   const handleShare = () => {
     if (typeof window !== 'undefined' && news) {
@@ -110,8 +127,20 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-error">{error || 'News not found'}</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-center">
+        <p className="text-error mb-4 font-medium max-w-md">{error || 'News article not found'}</p>
+        <button
+          onClick={() => setRetryTrigger(prev => prev + 1)}
+          className="px-6 py-2.5 bg-button text-on-primary rounded-lg font-medium hover:opacity-90 transition-all shadow-md mb-3"
+        >
+          Retry Loading
+        </button>
+        <button
+          onClick={() => router.push('/')}
+          className="px-6 py-2 bg-surfaceContainerLowest border border-outlineVariant text-on-surface rounded-lg font-medium hover:opacity-90 transition-all shadow-sm"
+        >
+          Go Back Home
+        </button>
       </div>
     )
   }
