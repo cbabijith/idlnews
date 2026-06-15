@@ -18,22 +18,14 @@ export function BottomNavBar() {
 
   return (
     <>
-      <nav className={`bg-surface font-label-caps text-label-caps fixed bottom-0 w-full z-50 border-t ${colors.outlineVariant} flex justify-around items-center h-16 px-4 md:hidden`}>
-        <Link className="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full" href="/">
-          <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: 'FILL 1' }}>home</span>
-          <span>Home</span>
-        </Link>
-        <button onClick={handleComingSoon} className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full bg-transparent border-none cursor-pointer">
-          <span className="material-symbols-outlined mb-1">live_tv</span>
-          <span>Live</span>
+      <nav className={`bg-surface font-label-caps text-label-caps fixed bottom-0 w-full z-50 border-t ${colors.outlineVariant} flex justify-around items-center h-16 px-4 md:hidden shadow-lg`}>
+        <button onClick={handleComingSoon} className="flex flex-col items-center justify-center text-button font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full bg-transparent border-none cursor-pointer">
+          <span className="material-symbols-outlined mb-1">trending_up</span>
+          <span>Trending</span>
         </button>
         <button onClick={handleComingSoon} className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full bg-transparent border-none cursor-pointer">
-          <span className="material-symbols-outlined mb-1">bookmark</span>
-          <span>Saved</span>
-        </button>
-        <button onClick={handleComingSoon} className="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full bg-transparent border-none cursor-pointer">
-          <span className="material-symbols-outlined mb-1">grid_view</span>
-          <span>Menu</span>
+          <span className="material-symbols-outlined mb-1">category</span>
+          <span>Categories</span>
         </button>
       </nav>
       

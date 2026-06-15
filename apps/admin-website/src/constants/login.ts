@@ -1,5 +1,5 @@
 export const LOGIN_TEXT = {
-  pageTitle: 'SNG News Admin',
+  pageTitle: 'IDL News Admin',
   pageSubtitle: 'Sign in to manage your news content',
   emailLabel: 'Email address',
   emailPlaceholder: 'Email address',

@@ -22,6 +22,7 @@ interface ThemeState {
     surfaceContainerLow: string
     surfaceContainerHigh: string
     outlineVariant: string
+    button: string
   }
 }
 
@@ -47,5 +48,6 @@ export const useThemeStore = create<ThemeState>(() => ({
     surfaceContainerLow: 'bg-surface-container-low',
     surfaceContainerHigh: 'bg-surface-container-high',
     outlineVariant: 'border-outline-variant',
+    button: 'bg-button',
   }
 }))

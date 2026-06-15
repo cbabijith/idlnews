@@ -27,7 +27,9 @@ export class NewsService {
     categoryId: string | null,
     createdById: string | null,
     isPublished = false,
-    subcategoryId: string | null = null
+    subcategoryId: string | null = null,
+    isPinned = false,
+    publishedAt: string | null = null
   ): Promise<ApiResponse<News>> {
     return newsRepository.create({
       title,
@@ -39,7 +41,8 @@ export class NewsService {
       subcategory_id: subcategoryId,
       created_by: createdById,
       is_published: isPublished,
-      published_at: isPublished ? new Date().toISOString() : null,
+      is_pinned: isPinned,
+      published_at: isPublished ? (publishedAt || new Date().toISOString()) : null,
     })
   }
 
@@ -52,7 +55,9 @@ export class NewsService {
     youtubeLink?: string | null,
     categoryId?: string | null,
     subcategoryId?: string | null,
-    isPublished?: boolean
+    isPublished?: boolean,
+    isPinned?: boolean,
+    publishedAt?: string | null
   ): Promise<ApiResponse<News>> {
     const updates: Partial<News> = {}
 
@@ -63,9 +68,18 @@ export class NewsService {
     if (youtubeLink !== undefined) updates.youtube_link = youtubeLink
     if (categoryId !== undefined) updates.category_id = categoryId
     if (subcategoryId !== undefined) updates.subcategory_id = subcategoryId
+    if (isPinned !== undefined) {
+      updates.is_pinned = isPinned
+      if (isPinned) {
+        updates.published_at = new Date().toISOString()
+      }
+    }
+    if (publishedAt !== undefined) updates.published_at = publishedAt
     if (isPublished !== undefined) {
       updates.is_published = isPublished
-      updates.published_at = isPublished ? new Date().toISOString() : null
+      if (publishedAt === undefined) {
+        updates.published_at = isPublished ? new Date().toISOString() : null
+      }
     }
 
     return newsRepository.update(id, updates)
@@ -83,6 +97,24 @@ export class NewsService {
     }
 
     return newsRepository.togglePublish(id, !current.data.is_published)
+  }
+
+  async togglePinStatus(id: string): Promise<ApiResponse<News>> {
+    // First get the current status
+    const current = await newsRepository.getById(id, false)
+    if (current.error || !current.data) {
+      return { data: null, error: current.error || 'News not found' }
+    }
+
+    const nextPinnedStatus = !current.data.is_pinned
+    const updates: Partial<News> = { is_pinned: nextPinnedStatus }
+    
+    // Auto-update published_at to now if pinning it
+    if (nextPinnedStatus) {
+      updates.published_at = new Date().toISOString()
+    }
+
+    return newsRepository.update(id, updates)
   }
 }
 

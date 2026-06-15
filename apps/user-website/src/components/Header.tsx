@@ -29,31 +29,31 @@ export function Header({ pinnedNews = [] }: HeaderProps) {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 ${colors.surface} border-b ${colors.outlineVariant} flex items-center justify-between px-4 md:px-8 h-16 w-full`}>
+      <header className={`sticky top-0 z-50 ${colors.surface} border-b ${colors.outlineVariant} flex items-center justify-between px-4 md:px-8 h-24 w-full shadow-sm`}>
         <button
           onClick={handleComingSoon}
           aria-label="Menu"
-          className="text-primary hover:text-primary-container transition-colors cursor-pointer active:opacity-70"
+          className="text-primary hover:opacity-80 transition-all cursor-pointer active:scale-95"
         >
-          <span className="material-symbols-outlined">menu</span>
+          <span className="material-symbols-outlined text-2xl">menu</span>
         </button>
-        <Link href="/" className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-primary tracking-tight hover:opacity-80 transition-opacity">
-          SNG NEWS
+        <Link href="/" className="hover:opacity-90 transition-opacity">
+          <img src="/logo.png" alt="IDL News" className="h-24 w-auto" />
         </Link>
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/search')}
             aria-label="Search"
-            className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-70"
+            className="text-on-surface-variant hover:text-primary transition-all cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined">search</span>
+            <span className="material-symbols-outlined text-2xl">search</span>
           </button>
           <button
             onClick={handleComingSoon}
             aria-label="Profile"
-            className="text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:opacity-70 hidden md:block"
+            className="text-on-surface-variant hover:text-primary transition-all cursor-pointer active:scale-95 hidden md:block"
           >
-            <span className="material-symbols-outlined">account_circle</span>
+            <span className="material-symbols-outlined text-2xl">account_circle</span>
           </button>
         </div>
       </header>

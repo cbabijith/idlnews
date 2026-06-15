@@ -1,0 +1,14 @@
+console.log('========================================');
+console.log('ADMIN USER SETUP - SQL COMMANDS');
+console.log('========================================');
+console.log('');
+console.log('The profile already exists. Run this SQL in Supabase SQL Editor:');
+console.log('');
+console.log('-- Update the existing profile to admin role');
+console.log("UPDATE profiles SET role = 'admin', updated_at = NOW() WHERE email = 'binukarunkaran@gmail.com';");
+console.log('');
+console.log('========================================');
+console.log('After running the SQL, sign in with:');
+console.log('Email: binukarunkaran@gmail.com');
+console.log('Password: admin123');
+console.log('========================================');

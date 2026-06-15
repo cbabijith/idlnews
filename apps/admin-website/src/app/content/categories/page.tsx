@@ -189,7 +189,7 @@ export default function CategoriesPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-8">
+      <div className="hidden sm:flex justify-between items-center mb-8">
         <h1 className={`text-4xl font-bold ${colors.text}`}>Categories</h1>
         <button
           onClick={() => {
@@ -202,6 +202,19 @@ export default function CategoriesPage() {
           Add Category
         </button>
       </div>
+
+      {/* Floating Add Category Button for Mobile only */}
+      <button
+        onClick={() => {
+          setShowCategoryForm(true)
+          setEditingCategory(null)
+          setCategoryFormData({ name: '', slug: '' })
+        }}
+        className="sm:hidden fixed bottom-24 right-6 w-14 h-14 bg-button text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all z-40"
+        title="Add Category"
+      >
+        <span className="text-3xl font-light">+</span>
+      </button>
 
       {showCategoryForm && (
         <div className={`${colors.card} p-6 rounded-lg shadow mb-8`}>

@@ -22,9 +22,9 @@ export function CategoryBar({ categories, selectedCategory, onCategorySelect }: 
       <div className="flex space-x-2 px-margin-mobile md:px-4 py-3 min-w-max md:justify-center md:min-w-0 max-w-container-max mx-auto">
         <button
           onClick={() => onCategorySelect(null)}
-          className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-colors ${
+          className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-all shadow-sm ${
             selectedCategory === null
-              ? 'bg-primary text-on-primary'
+              ? 'bg-button text-on-primary shadow-md'
               : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
           }`}
         >
@@ -35,9 +35,9 @@ export function CategoryBar({ categories, selectedCategory, onCategorySelect }: 
             <button
               key={category.id}
               onClick={() => onCategorySelect(category.id)}
-              className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-colors ${
+              className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-all shadow-sm ${
                 selectedCategory === category.id
-                  ? 'bg-primary text-on-primary'
+                  ? 'bg-button text-on-primary shadow-md'
                   : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
               }`}
             >

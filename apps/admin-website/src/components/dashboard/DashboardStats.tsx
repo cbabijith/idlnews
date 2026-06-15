@@ -12,13 +12,13 @@ interface StatCardProps {
 function StatCard({ title, value, icon, color }: StatCardProps) {
   const { colors } = useThemeStore()
   return (
-    <div className={`${colors.card} p-6 rounded-lg shadow`}>
+    <div className={`${colors.card} p-4 sm:p-6 rounded-lg shadow`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className={`text-sm ${colors.textSecondary}`}>{title}</p>
-          <p className={`text-3xl font-bold ${colors.text} mt-2`}>{value}</p>
+          <p className={`text-xs sm:text-sm ${colors.textSecondary}`}>{title}</p>
+          <p className={`text-2xl sm:text-3xl font-bold ${colors.text} mt-2`}>{value}</p>
         </div>
-        <div className={`text-4xl ${color}`}>{icon}</div>
+        <div className={`text-3xl sm:text-4xl ${color}`}>{icon}</div>
       </div>
     </div>
   )

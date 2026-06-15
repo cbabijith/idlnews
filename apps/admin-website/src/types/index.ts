@@ -41,13 +41,14 @@ export interface News {
   category_id: string | null
   subcategory_id: string | null
   is_published: boolean
+  is_pinned: boolean
   published_at: string | null
   created_at: string
   updated_at: string
   created_by: string | null
   categories?: Category
   subcategories?: Subcategory
-  profile?: Profile
+  profiles?: Profile
 }
 
 export interface Comment {

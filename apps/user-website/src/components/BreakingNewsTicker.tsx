@@ -2,6 +2,8 @@
 
 import { useThemeStore } from '@/store/themeStore'
 
+import Link from 'next/link'
+
 interface NewsItem {
   id: string
   title: string
@@ -15,17 +17,32 @@ interface BreakingNewsTickerProps {
 export function BreakingNewsTicker({ pinnedNews = [], latestNews = [] }: BreakingNewsTickerProps) {
   const { colors } = useThemeStore()
 
-  // Combine pinned news and latest 4 news items
-  const allNews = [...pinnedNews, ...latestNews.slice(0, 4)]
+  // Combine pinned news and latest 3 news items
+  const allNews = [...pinnedNews, ...latestNews.slice(0, 3)]
   
-  const tickerContent = allNews.length > 0 
-    ? allNews.map(item => item.title).join(' • • ')
-    : 'Latest news updates will appear here...'
+  if (allNews.length === 0) {
+    return null
+  }
+
+  const renderTickerList = () => (
+    <div className="flex items-center gap-12 px-6">
+      {allNews.map((item, index) => (
+        <Link
+          key={`${item.id}-${index}`}
+          href={`/news/${item.id}`}
+          className="hover:underline flex items-center whitespace-nowrap text-on-secondary-container text-sm sm:text-base font-semibold group transition-all"
+        >
+          <span>{item.title}</span>
+        </Link>
+      ))}
+    </div>
+  )
 
   return (
-    <div className="bg-secondary-container text-on-secondary-container font-label-category text-label-category py-2 w-full overflow-hidden flex items-center px-0 md:px-0">
-      <div className="ticker whitespace-nowrap animate-marquee">
-        {tickerContent}
+    <div className="bg-secondary-container text-on-secondary-container py-2.5 w-full overflow-hidden flex border-y border-secondary/20 shadow-inner">
+      <div className="animate-marquee flex">
+        {renderTickerList()}
+        {renderTickerList()}
       </div>
     </div>
   )

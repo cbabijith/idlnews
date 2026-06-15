@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import supabase from '@sngnews/shared-supabase'
+import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BottomNavBar } from '@/components/BottomNavBar'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
@@ -60,7 +60,41 @@ export default function NewsDetailPage() {
 
   const handleShare = () => {
     if (typeof window !== 'undefined' && news) {
-      const shareText = `${news.title}\n\n${news.description || news.content?.replace(/<[^>]*>/g, '').substring(0, 150) || ''}\n\n${window.location.href}`
+      const category = news.categories?.name || 'ബ്രേക്കിംഗ് ന്യൂസ്'
+      const description = news.description || news.content?.replace(/<[^>]*>/g, '').substring(0, 200) || ''
+      const newsUrl = window.location.href
+      const publishedDate = news.published_at
+        ? new Date(news.published_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : ''
+      
+      const shareText = `📰 IDL NEWS | ${category}
+
+✍️ ${news.title}
+
+${description}
+
+👉 *മുഴുവൻ വാർത്ത വായിക്കാൻ:*
+${newsUrl}
+
+📅 Published: ${publishedDate}
+
+━━━━━━━━━━━━━━━
+
+📲 IDL NEWS വാട്സ്ആപ്പ് ചാനലിൽ ചേരൂ
+
+കേരളത്തിലെയും ലോകത്തെയും പ്രധാന വാർത്തകൾ, ബ്രേക്കിംഗ് അപ്ഡേറ്റുകൾ, പ്രത്യേക റിപ്പോർട്ടുകൾ എന്നിവ അതിവേഗം ലഭിക്കാൻ ഞങ്ങളുടെ വാട്സ്ആപ്പ് ചാനലിൽ ഇപ്പോൾ തന്നെ ജോയിൻ ചെയ്യൂ
+
+👇 ചാനലിൽ ചേരാൻ
+https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
+
+━━━━━━━━━━━━━━━
+*IDL NEWS
+സത്യസന്ധവും വേഗമേറിയതുമായ വാർത്തകൾ* 🌐www.idlnews.com`
+      
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`
       window.open(whatsappUrl, '_blank')
     }
@@ -101,7 +135,7 @@ export default function NewsDetailPage() {
         <article className="flex flex-col gap-stack-sm">
           <div className="flex items-center gap-base">
             {news.categories && (
-              <span className="bg-primary-container text-on-primary font-label-category text-label-category px-3 py-1 rounded-DEFAULT inline-block w-max">
+              <span className="bg-primary-container text-on-primary-container font-label-category text-label-category px-3 py-1 rounded-DEFAULT inline-block w-max">
                 {news.categories.name}
               </span>
             )}
@@ -154,7 +188,7 @@ export default function NewsDetailPage() {
         <div className="mt-stack-lg flex justify-center">
           <button
             onClick={handleShare}
-            className="bg-primary text-on-primary font-label-category text-label-category px-6 py-3 rounded-full flex items-center gap-2 hover:bg-surface-tint transition-colors active:scale-95 duration-150 shadow-sm border border-transparent"
+            className="bg-button text-on-primary font-label-category text-label-category px-6 py-3 rounded-full flex items-center gap-2 hover:bg-button-hover transition-all active:scale-95 duration-150 shadow-md hover:shadow-lg border border-transparent"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: 'FILL 1' }}>
               share
@@ -170,7 +204,7 @@ export default function NewsDetailPage() {
       {/* Footer */}
       <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-24 md:pb-stack-md">
         <div className="font-headline-md text-headline-md text-primary-fixed">
-          SNG NEWS
+          IDL NEWS
         </div>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
@@ -187,7 +221,7 @@ export default function NewsDetailPage() {
           </a>
         </div>
         <p className="text-inverse-on-surface opacity-60 text-sm mt-4">
-          © 2024 SNG വാർത്തകൾ. All rights reserved.
+          © 2024 IDL വാർത്തകൾ. All rights reserved.
         </p>
       </footer>
     </div>

@@ -28,7 +28,7 @@ interface NewsItem {
 
 async function getNews(id: string): Promise<NewsItem | null> {
   try {
-    const { createSupabaseClient } = await import('@sngnews/shared-supabase')
+    const { createSupabaseClient } = await import('@idlnews/shared-supabase')
     const supabase = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!news) {
     return {
-      title: 'News Not Found - SNG വാർത്തകൾ',
+      title: 'News Not Found - IDL വാർത്തകൾ',
       description: 'The requested news article could not be found.',
     }
   }
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const imageUrl = news.image_url || ''
 
   return {
-    title: `${news.title} - SNG വാർത്തകൾ`,
+    title: `${news.title} - IDL വാർത്തകൾ`,
     description: description,
     openGraph: {
       title: news.title,
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       ] : [],
       type: 'article',
       publishedTime: news.published_at,
-      siteName: 'SNG വാർത്തകൾ',
+      siteName: 'IDL വാർത്തകൾ',
     },
     twitter: {
       card: 'summary_large_image',

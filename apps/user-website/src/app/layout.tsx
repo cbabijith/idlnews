@@ -15,8 +15,8 @@ const beVietnamPro = Be_Vietnam_Pro({
 })
 
 export const metadata: Metadata = {
-  title: 'SNG News - User Website',
-  description: 'SNG News User Portal',
+  title: 'IDL News - User Website',
+  description: 'IDL News User Portal',
 }
 
 export default function RootLayout({

@@ -8,7 +8,7 @@ export class NewsRepository {
     try {
       const query = supabase
         .from('news')
-        .select(includeCategory ? '*, categories(*)' : '*')
+        .select(includeCategory ? '*, categories(*), profiles(*)' : '*, profiles(*)')
         .order('created_at', { ascending: false })
 
       const { data, error } = await query
@@ -28,7 +28,7 @@ export class NewsRepository {
     try {
       const query = supabase
         .from('news')
-        .select(includeCategory ? '*, categories(*)' : '*')
+        .select(includeCategory ? '*, categories(*), profiles(*)' : '*, profiles(*)')
         .eq('id', id)
         .single()
 

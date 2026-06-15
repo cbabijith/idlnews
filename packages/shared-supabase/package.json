@@ -1,5 +1,5 @@
 {
-  "name": "@sngnews/shared-supabase",
+  "name": "@idlnews/shared-supabase",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -9,7 +9,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.7"
+    "@supabase/supabase-js": "^2.39.7",
+    "@aws-sdk/client-s3": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.41",

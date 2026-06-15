@@ -7,7 +7,7 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
   --primary-color: #FFEF91;
-  --button-color: #FFA02E;
+  --button-color: #DC2626;
 }
 
 @media (prefers-color-scheme: dark) {

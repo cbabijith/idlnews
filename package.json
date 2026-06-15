@@ -1,8 +1,8 @@
 {
-  "name": "sngnews-monorepo",
+  "name": "idlnews-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Monorepo for SNG News - User/Admin Websites and Apps",
+  "description": "Monorepo for IDL News - User/Admin Websites and Apps",
   "workspaces": [
     "packages/*",
     "apps/user-website",

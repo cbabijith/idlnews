@@ -15,6 +15,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
       StarterKit,
     ],
     content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
@@ -39,6 +40,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
     <div className="border rounded-lg overflow-hidden">
       <div className="flex gap-2 p-2 bg-gray-100 border-b">
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={`px-3 py-1 rounded text-black ${editor.isActive('bold') ? 'bg-orange-500 text-white' : 'bg-white hover:bg-gray-200'}`}
@@ -47,6 +49,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <strong>B</strong>
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={`px-3 py-1 rounded text-black ${editor.isActive('italic') ? 'bg-orange-500 text-white' : 'bg-white hover:bg-gray-200'}`}
@@ -55,6 +58,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           <em>I</em>
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           disabled={!editor.can().chain().focus().toggleBulletList().run()}
           className={`px-3 py-1 rounded text-black ${editor.isActive('bulletList') ? 'bg-orange-500 text-white' : 'bg-white hover:bg-gray-200'}`}

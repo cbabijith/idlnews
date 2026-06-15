@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import supabase from '@sngnews/shared-supabase'
+import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BottomNavBar } from '@/components/BottomNavBar'
 import { useThemeStore } from '@/store/themeStore'
@@ -30,43 +30,39 @@ function SearchContent() {
   const [searchQuery, setSearchQuery] = useState(query)
   const [results, setResults] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(false)
-  const [debouncedQuery, setDebouncedQuery] = useState(query)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Debounce search query
+  // Close dropdown when clicking outside
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  // Update URL when debounced query changes
-  useEffect(() => {
-    if (debouncedQuery) {
-      const url = new URL(window.location.href)
-      url.searchParams.set('q', debouncedQuery)
-      window.history.replaceState({}, '', url)
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
     }
-  }, [debouncedQuery])
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Search from server
   useEffect(() => {
     async function searchNews() {
-      if (!debouncedQuery.trim()) {
+      if (!searchQuery.trim()) {
         setResults([])
+        setShowDropdown(false)
         return
       }
 
       setLoading(true)
+      setShowDropdown(true)
       try {
         const { data, error } = await supabase
           .from('news')
           .select('id, title, content, image_url, published_at, categories(name, slug), profiles(full_name)')
           .eq('is_published', true)
-          .or(`title.ilike.%${debouncedQuery}%,content.ilike.%${debouncedQuery}%`)
+          .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
           .order('published_at', { ascending: false })
-          .limit(20)
+          .limit(10)
 
         if (error) throw error
         setResults(data as unknown as NewsItem[])
@@ -77,17 +73,18 @@ function SearchContent() {
       }
     }
 
-    searchNews()
-  }, [debouncedQuery])
+    const timer = setTimeout(searchNews, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   return (
     <div className={`min-h-screen ${colors.background} pb-[80px] md:pb-0`}>
       <Header />
       
       <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-md">
-        {/* Search Input */}
-        <div className="mb-6">
-          <div className={`relative ${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-lg`}>
+        {/* Search Input with Dropdown */}
+        <div className="mb-6 relative" ref={dropdownRef}>
+          <div className={`relative ${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-xl`}>
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
               search
             </span>
@@ -95,61 +92,117 @@ function SearchContent() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowDropdown(true)}
               placeholder="Search news..."
               className="w-full pl-12 pr-4 py-3 bg-transparent text-on-surface placeholder:text-on-surface-variant focus:outline-none"
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchQuery('')
+                  setResults([])
+                  setShowDropdown(false)
+                }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
             )}
           </div>
+
+          {/* Dropdown Results */}
+          {showDropdown && (
+            <div className={`absolute top-full left-0 right-0 mt-2 ${colors.surface} border ${colors.outlineVariant} rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto`}>
+              {loading && (
+                <div className="text-center py-8">
+                  <p className="text-on-surface-variant">Searching...</p>
+                </div>
+              )}
+
+              {!loading && searchQuery && results.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-on-surface-variant">No results found for "{searchQuery}"</p>
+                </div>
+              )}
+
+              {!loading && !searchQuery && (
+                <div className="text-center py-8">
+                  <p className="text-on-surface-variant">Enter a search term to find news</p>
+                </div>
+              )}
+
+              {!loading && results.length > 0 && (
+                <div className="p-2">
+                  <p className="text-on-surface-variant text-xs px-3 py-2">
+                    Found {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    {results.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/news/${item.id}`}
+                        onClick={() => setShowDropdown(false)}
+                        className="block"
+                      >
+                        <article className={`flex gap-3 ${colors.surfaceContainerLowest} hover:bg-surface-container-high p-3 rounded-lg transition-colors`}>
+                          {item.image_url && (
+                            <img
+                              src={item.image_url}
+                              alt={item.title}
+                              className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex flex-col justify-between flex-1 min-w-0">
+                            {item.categories && (
+                              <span className="text-button font-label-caps text-label-caps text-xs">
+                                {item.categories.name}
+                              </span>
+                            )}
+                            <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 leading-tight">
+                              {item.title}
+                            </h4>
+                            {item.published_at && (
+                              <span className="text-on-surface-variant text-xs">
+                                {new Date(item.published_at).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric'
+                                })}
+                              </span>
+                            )}
+                          </div>
+                        </article>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Search Results */}
-        {loading && (
-          <div className="text-center py-8">
-            <p className="text-on-surface-variant">Searching...</p>
-          </div>
-        )}
-
-        {!loading && debouncedQuery && results.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-on-surface-variant">No results found for "{debouncedQuery}"</p>
-          </div>
-        )}
-
-        {!loading && !debouncedQuery && (
-          <div className="text-center py-8">
-            <p className="text-on-surface-variant">Enter a search term to find news</p>
-          </div>
-        )}
-
-        {!loading && results.length > 0 && (
+        {/* Full Results List */}
+        {!showDropdown && results.length > 0 && (
           <div className="flex flex-col gap-4">
             <p className="text-on-surface-variant text-sm">
-              Found {results.length} result{results.length !== 1 ? 's' : ''} for "{debouncedQuery}"
+              Found {results.length} result{results.length !== 1 ? 's' : ''} for "{searchQuery}"
             </p>
             {results.map((item) => (
               <Link key={item.id} href={`/news/${item.id}`} className="block">
-                <article className={`flex gap-4 ${colors.surfaceContainerLowest} border ${colors.outlineVariant} p-4 rounded-lg hover:shadow-md transition-shadow`}>
+                <article className={`flex gap-4 ${colors.surfaceContainerLowest} border ${colors.outlineVariant} p-4 rounded-xl hover:shadow-md transition-shadow`}>
                   {item.image_url && (
                     <img
                       src={item.image_url}
                       alt={item.title}
-                      className="w-24 h-24 object-cover rounded flex-shrink-0"
+                      className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
                     />
                   )}
                   <div className="flex flex-col justify-between flex-1 min-w-0">
                     {item.categories && (
-                      <span className="text-primary font-label-caps text-label-caps text-xs">
+                      <span className="text-button font-label-caps text-label-caps text-xs">
                         {item.categories.name}
                       </span>
                     )}
-                    <h4 className="font-label-category text-label-category text-on-surface line-clamp-2">
+                    <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 leading-tight">
                       {item.title}
                     </h4>
                     <div className="flex items-center gap-2 text-on-surface-variant text-xs">

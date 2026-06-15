@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import supabase from '@sngnews/shared-supabase'
+import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BreakingNewsTicker } from '@/components/BreakingNewsTicker'
 import { CategoryBar } from '@/components/CategoryBar'
@@ -147,24 +147,31 @@ export default function Home() {
         {featuredNews && (
           <section className="px-margin-mobile py-stack-md">
             <Link href={`/news/${featuredNews.id}`} className="block">
-              <div className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-lg overflow-hidden relative`}>
-                {featuredNews.categories && (
-                  <div className="absolute top-0 left-0 bg-primary text-on-primary font-label-caps text-label-caps px-3 py-1 m-2 rounded z-10">
-                    {featuredNews.categories.name}
-                  </div>
-                )}
-                {featuredNews.image_url && (
-                  <img
-                    src={featuredNews.image_url}
-                    alt={featuredNews.title}
-                    className="w-full h-48 object-cover"
-                  />
-                )}
-                <div className="p-4">
-                  <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">
+              <div className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow duration-300`}>
+                {featuredNews.image_url ? (
+                  <>
+                    {featuredNews.categories && (
+                      <div className="absolute top-0 left-0 bg-button text-on-primary font-label-caps text-label-caps px-4 py-1.5 m-3 rounded-full z-10 shadow-md">
+                        {featuredNews.categories.name}
+                      </div>
+                    )}
+                    <img
+                      src={featuredNews.image_url}
+                      alt={featuredNews.title}
+                      className="w-full h-56 object-cover"
+                    />
+                  </>
+                ) : null}
+                <div className="p-5">
+                  {!featuredNews.image_url && featuredNews.categories && (
+                    <div className="inline-block bg-button text-on-primary font-label-caps text-label-caps px-4 py-1.5 mb-3 rounded-full shadow-md">
+                      {featuredNews.categories.name}
+                    </div>
+                  )}
+                  <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-3 leading-tight">
                     {featuredNews.title}
                   </h2>
-                  <div className="flex items-center gap-2 text-on-surface-variant text-xs mb-3">
+                  <div className="flex items-center gap-2 text-on-surface-variant text-xs mb-4">
                     {featuredNews.published_at && (
                       <span>
                         {new Date(featuredNews.published_at).toLocaleDateString('en-US', { 
@@ -183,15 +190,15 @@ export default function Home() {
                       <span>• {featuredNews.profile.email}</span>
                     )}
                     {!featuredNews.profile?.full_name && !featuredNews.profile?.email && (
-                      <span>• SNG News Admin</span>
+                      <span>• IDL News Admin</span>
                     )}
                   </div>
                   {featuredNews.content && (
-                    <p className="font-body-md text-body-md text-on-surface-variant mb-4 line-clamp-2">
+                    <p className="font-body-md text-body-md text-on-surface-variant mb-5 line-clamp-2">
                       {featuredNews.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                     </p>
                   )}
-                  <button className="bg-primary text-on-primary font-label-category text-label-category px-6 py-2 rounded flex items-center justify-center w-full active:opacity-80 transition-opacity">
+                  <button className="bg-button text-on-primary font-label-category text-label-category px-6 py-2.5 rounded-xl flex items-center justify-center w-full active:scale-95 transition-all shadow-md hover:shadow-lg hover:bg-button-hover">
                     Read More
                   </button>
                 </div>
@@ -202,28 +209,28 @@ export default function Home() {
 
         {/* Latest News List */}
         <section className="px-margin-mobile pb-stack-lg">
-          <h3 className="font-headline-md text-headline-md-mobile text-on-surface mb-stack-sm flex items-center border-l-4 border-primary pl-2">
+          <h3 className="font-headline-md text-headline-md-mobile text-on-surface mb-stack-sm flex items-center border-l-4 border-button pl-3">
             Latest Stories
           </h3>
           <div className="flex flex-col gap-stack-sm">
             {latestNews.length > 0 ? (
               latestNews.map((item) => (
                 <Link key={item.id} href={`/news/${item.id}`} className="block">
-                  <article className={`flex gap-4 ${colors.surfaceContainerLowest} border ${colors.outlineVariant} p-2 rounded-lg`}>
+                  <article className={`flex gap-4 ${colors.surfaceContainerLowest} border ${colors.outlineVariant} p-3 rounded-xl hover:shadow-md transition-shadow duration-300`}>
                     {item.image_url && (
                       <img
                         src={item.image_url}
                         alt={item.title}
-                        className="w-24 h-24 object-cover rounded flex-shrink-0"
+                        className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
                       />
                     )}
                     <div className="flex flex-col justify-between flex-1 min-w-0">
                       {item.categories && (
-                        <span className="text-primary font-label-caps text-label-caps">
+                        <span className="text-button font-label-caps text-label-caps">
                           {item.categories.name}
                         </span>
                       )}
-                      <h4 className="font-label-category text-label-category text-on-surface line-clamp-2">
+                      <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 leading-tight">
                         {item.title}
                       </h4>
                       <div className="flex items-center gap-2 text-on-surface-variant text-[10px]">
@@ -245,7 +252,7 @@ export default function Home() {
                           <span>• {item.profile.email}</span>
                         )}
                         {!item.profile?.full_name && !item.profile?.email && (
-                          <span>• SNG News Admin</span>
+                          <span>• IDL News Admin</span>
                         )}
                       </div>
                     </div>
@@ -264,19 +271,19 @@ export default function Home() {
         <div className="grid grid-cols-12 gap-6">
           {/* Left Column - Latest News (3 cols) */}
           <div className="col-span-3">
-            <h3 className="font-headline-md text-on-surface mb-4 flex items-center border-l-4 border-primary pl-2">
+            <h3 className="font-headline-md text-on-surface mb-4 flex items-center border-l-4 border-button pl-3">
               ഏറ്റവും പുതിയ വാർത്തകൾ
             </h3>
             <div className="flex flex-col gap-3">
               {latestNews.slice(0, 10).map((item) => (
                 <Link key={item.id} href={`/news/${item.id}`} className="block">
-                  <article className={`p-3 rounded-lg ${colors.surfaceContainerLowest} border ${colors.outlineVariant} hover:shadow-md transition-shadow`}>
+                  <article className={`p-4 rounded-xl ${colors.surfaceContainerLowest} border ${colors.outlineVariant} hover:shadow-md transition-shadow duration-300`}>
                     {item.categories && (
-                      <span className="text-primary font-label-caps text-label-caps text-xs">
+                      <span className="text-button font-label-caps text-label-caps text-xs">
                         {item.categories.name}
                       </span>
                     )}
-                    <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 mt-1">
+                    <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 mt-1 leading-tight">
                       {item.title}
                     </h4>
                     <div className="flex items-center gap-2 text-on-surface-variant text-xs mt-2">
@@ -298,7 +305,7 @@ export default function Home() {
                         <span>• {item.profile.email}</span>
                       )}
                       {!item.profile?.full_name && !item.profile?.email && (
-                        <span>• SNG News Admin</span>
+                        <span>• IDL News Admin</span>
                       )}
                     </div>
                   </article>
@@ -311,21 +318,28 @@ export default function Home() {
           <div className="col-span-6">
             {featuredNews && (
               <Link href={`/news/${featuredNews.id}`} className="block">
-                <div className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-lg overflow-hidden`}>
-                  {featuredNews.categories && (
-                    <div className="absolute top-0 left-0 bg-primary text-on-primary font-label-caps text-label-caps px-4 py-2 m-4 rounded z-10">
-                      {featuredNews.categories.name}
-                    </div>
-                  )}
-                  {featuredNews.image_url && (
-                    <img
-                      src={featuredNews.image_url}
-                      alt={featuredNews.title}
-                      className="w-full h-96 object-cover"
-                    />
-                  )}
+                <div className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow duration-300`}>
+                  {featuredNews.image_url ? (
+                    <>
+                      {featuredNews.categories && (
+                        <div className="absolute top-0 left-0 bg-button text-on-primary font-label-caps text-label-caps px-4 py-1.5 m-4 rounded-full z-10 shadow-md">
+                          {featuredNews.categories.name}
+                        </div>
+                      )}
+                      <img
+                        src={featuredNews.image_url}
+                        alt={featuredNews.title}
+                        className="w-full h-96 object-cover"
+                      />
+                    </>
+                  ) : null}
                   <div className="p-6">
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface mb-3">
+                    {!featuredNews.image_url && featuredNews.categories && (
+                      <div className="inline-block bg-button text-on-primary font-label-caps text-label-caps px-4 py-1.5 mb-3 rounded-full shadow-md">
+                        {featuredNews.categories.name}
+                      </div>
+                    )}
+                    <h2 className="font-headline-lg text-headline-lg text-on-surface mb-3 leading-tight">
                       {featuredNews.title}
                     </h2>
                     <div className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
@@ -347,7 +361,7 @@ export default function Home() {
                         <span>• {featuredNews.profile.email}</span>
                       )}
                       {!featuredNews.profile?.full_name && !featuredNews.profile?.email && (
-                        <span>• SNG News Admin</span>
+                        <span>• IDL News Admin</span>
                       )}
                     </div>
                     {featuredNews.content && (
@@ -355,7 +369,7 @@ export default function Home() {
                         {featuredNews.content.replace(/<[^>]*>/g, '').substring(0, 200)}...
                       </p>
                     )}
-                    <button className="bg-primary text-on-primary font-label-category text-label-category px-8 py-3 rounded hover:opacity-90 transition-opacity">
+                    <button className="bg-button text-on-primary font-label-category text-label-category px-8 py-3 rounded-xl hover:bg-button-hover transition-all shadow-md hover:shadow-lg">
                       കൂടുതൽ വായിക്കുക
                     </button>
                   </div>
@@ -366,13 +380,13 @@ export default function Home() {
 
           {/* Right Column - Trending/Multimedia (3 cols) */}
           <div className="col-span-3">
-            <h3 className="font-headline-md text-on-surface mb-4 flex items-center border-l-4 border-primary pl-2">
+            <h3 className="font-headline-md text-on-surface mb-4 flex items-center border-l-4 border-button pl-3">
               ട്രെൻഡിംഗ് / മൾട്ടിമീഡിയ
             </h3>
             <div className="flex flex-col gap-4">
               {pinnedNews.slice(1, 6).map((item) => (
                 <Link key={item.id} href={`/news/${item.id}`} className="block">
-                  <article className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-lg overflow-hidden hover:shadow-md transition-shadow`}>
+                  <article className={`${colors.surfaceContainerLowest} border ${colors.outlineVariant} rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300`}>
                     <div className="relative">
                       {item.image_url && (
                         <img
@@ -389,11 +403,11 @@ export default function Home() {
                     </div>
                     <div className="p-3">
                       {item.categories && (
-                        <span className="text-primary font-label-caps text-label-caps text-xs">
+                        <span className="text-button font-label-caps text-label-caps text-xs">
                           {item.categories.name}
                         </span>
                       )}
-                      <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 mt-1">
+                      <h4 className="font-label-category text-label-category text-on-surface line-clamp-2 mt-1 leading-tight">
                         {item.title}
                       </h4>
                       <div className="flex items-center gap-2 text-on-surface-variant text-xs mt-2">
@@ -414,7 +428,7 @@ export default function Home() {
                           <span>• {item.profile.email}</span>
                         )}
                         {!item.profile?.full_name && !item.profile?.email && (
-                          <span>• SNG News Admin</span>
+                          <span>• IDL News Admin</span>
                         )}
                       </div>
                     </div>
