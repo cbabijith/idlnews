@@ -28,6 +28,7 @@ export function NewsClient({
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(initialNews.length < initialCount)
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null)
 
   // Search, filtering and sorting states
   const [searchQuery, setSearchQuery] = useState('')
@@ -127,9 +128,7 @@ export function NewsClient({
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this news item?')) return
-    
+  const performDelete = async (id: string) => {
     const newsItem = newsItems.find(item => item.id === id)
     
     if (newsItem?.image_url) {
@@ -278,14 +277,14 @@ export function NewsClient({
                           📌 Pinned
                         </span>
                       )}
-                      <span suppressHydrationWarning className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
+                      <span suppressHydrationWarning className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
                         Created: {new Date(item.created_at).toLocaleDateString()}
                       </span>
-                      <span suppressHydrationWarning className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Updated: ${new Date(item.updated_at).toLocaleString()}`}>
+                      <span suppressHydrationWarning className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Updated: ${new Date(item.updated_at).toLocaleString()}`}>
                         Updated: {new Date(item.updated_at).toLocaleDateString()}
                       </span>
                       {item.profiles && (
-                        <span className={`text-[10px] sm:text-xs ${colors.textSecondary} font-semibold`} title={`Written by: ${item.profiles.full_name || item.profiles.email}`}>
+                        <span className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary} font-semibold`} title={`Written by: ${item.profiles.full_name || item.profiles.email}`}>
                           By: {item.profiles.full_name || item.profiles.email?.split('@')[0]}
                         </span>
                       )}
@@ -358,8 +357,8 @@ export function NewsClient({
                         </svg>
                       </Link>
                       <button
-                        onClick={() => handleDelete(item.id)}
-                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-150"
+                        onClick={() => setDeleteItemId(item.id)}
+                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-red-55 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-150"
                         title="Delete"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -375,6 +374,35 @@ export function NewsClient({
           </>
         )}
       </div>
+
+      {deleteItemId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`${colors.card} p-6 rounded-lg shadow-lg max-w-md w-full mx-auto`}>
+            <h3 className={`text-xl font-semibold mb-4 ${colors.text}`}>Delete News Article?</h3>
+            <p className={`${colors.text} mb-6 text-sm`}>
+              Are you sure you want to permanently delete this news article? This will also remove its image from the storage bucket and cannot be undone.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <button
+                onClick={() => setDeleteItemId(null)}
+                className="w-full sm:w-auto px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-medium transition-all"
+              >
+                Keep Article
+              </button>
+              <button
+                onClick={async () => {
+                  const id = deleteItemId
+                  setDeleteItemId(null)
+                  await performDelete(id)
+                }}
+                className="w-full sm:w-auto px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium transition-all"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }
