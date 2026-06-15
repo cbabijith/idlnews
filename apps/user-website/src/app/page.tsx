@@ -461,6 +461,33 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Footer */}
+      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-24 md:pb-stack-md">
+        <div className="font-headline-md text-headline-md text-primary-fixed">
+          IDL NEWS
+        </div>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
+            ഞങ്ങളെക്കുറിച്ച്
+          </a>
+          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
+            പരസ്യം
+          </a>
+          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
+            സ്വകാര്യതാ നയം
+          </a>
+          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
+            സമ്പർക്കം
+          </a>
+        </div>
+        <p className="text-inverse-on-surface opacity-60 text-sm mt-4">
+          © 2024 IDL വാർത്തകൾ. All rights reserved.
+        </p>
+        <p className="text-inverse-on-surface opacity-50 text-xs mt-1">
+          Made by <a href="https://abijithcb.com" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-secondary-fixed transition-colors">abijithcb.com</a>
+        </p>
+      </footer>
+
       <BottomNavBar />
       <WhatsAppButton />
     </div>

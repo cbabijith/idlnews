@@ -252,6 +252,9 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
         <p className="text-inverse-on-surface opacity-60 text-sm mt-4">
           © 2024 IDL വാർത്തകൾ. All rights reserved.
         </p>
+        <p className="text-inverse-on-surface opacity-50 text-xs mt-1">
+          Made by <a href="https://abijithcb.com" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-secondary-fixed transition-colors">abijithcb.com</a>
+        </p>
       </footer>
     </div>
   )
