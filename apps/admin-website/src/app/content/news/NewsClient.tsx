@@ -240,9 +240,7 @@ export function NewsClient({
         <div className={`text-xs ${colors.textSecondary} w-full lg:w-auto text-left lg:text-right mt-2 lg:mt-0 font-medium`}>
           Showing {newsItems.length} of {count} articles
         </div>
-      </div>
-
-      <div className="grid gap-4">
+      </div>      <div className="grid gap-4 pb-24">
         {loading && newsItems.length === 0 ? (
           <p className={`${colors.textSecondary} text-center py-8`}>Loading news...</p>
         ) : newsItems.length === 0 ? (
@@ -280,10 +278,10 @@ export function NewsClient({
                           📌 Pinned
                         </span>
                       )}
-                      <span className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
+                      <span suppressHydrationWarning className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
                         Created: {new Date(item.created_at).toLocaleDateString()}
                       </span>
-                      <span className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Updated: ${new Date(item.updated_at).toLocaleString()}`}>
+                      <span suppressHydrationWarning className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Updated: ${new Date(item.updated_at).toLocaleString()}`}>
                         Updated: {new Date(item.updated_at).toLocaleDateString()}
                       </span>
                       {item.profiles && (
@@ -317,38 +315,56 @@ export function NewsClient({
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => togglePublish(item)}
-                        className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-white rounded-lg hover:opacity-90 transition-opacity text-[10px] sm:text-xs ${
-                          item.is_published ? 'bg-yellow-500' : 'bg-green-500'
+                        className={`w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+                          item.is_published 
+                            ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' 
+                            : 'bg-green-50 text-green-700 hover:bg-green-100'
                         }`}
                         title={item.is_published ? 'Unpublish' : 'Publish'}
                       >
-                        {item.is_published ? '↓' : '↑'}
+                        {item.is_published ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                          </svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                          </svg>
+                        )}
                       </button>
                       <button
                         onClick={() => togglePin(item)}
-                        className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-white rounded-lg hover:opacity-90 transition-opacity text-[10px] sm:text-xs ${
-                          item.is_pinned ? 'bg-indigo-600' : 'bg-gray-400'
+                        className={`w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+                          item.is_pinned 
+                            ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' 
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                         }`}
                         title={item.is_pinned ? 'Unpin' : 'Pin'}
                       >
-                        📌
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                        </svg>
                       </button>
                       <Link
                         href={`/content/news/edit/${item.id}`}
-                        className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-button text-white rounded-lg hover:opacity-90 transition-opacity text-[10px] sm:text-xs"
+                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-150"
                         title="Edit"
                       >
-                        ✎
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                        </svg>
                       </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 transition-opacity text-[10px] sm:text-xs"
+                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-150"
                         title="Delete"
                       >
-                        ✕
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
                       </button>
                     </div>
                   </div>
