@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BreakingNewsTicker } from '@/components/BreakingNewsTicker'
@@ -47,14 +48,42 @@ function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
 }
 
 export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background pb-[128px] md:pb-0">
+        <Header />
+        <div className="h-10 bg-surface-container border-b border-outline-variant" />
+        <div className="flex gap-2 px-4 py-3 overflow-hidden">
+          {[1,2,3,4,5].map(i => <ShimmerBox key={i} className="h-8 w-24 rounded-full flex-shrink-0" />)}
+        </div>
+        <main className="block md:hidden px-4 py-4">
+          <FeaturedNewsShimmer />
+          <div className="mt-6 flex flex-col gap-3">
+            {[1,2,3,4,5].map(i => <NewsCardShimmer key={i} />)}
+          </div>
+        </main>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  )
+}
+
+function HomeContent() {
   const { colors } = useThemeStore()
+  const searchParams = useSearchParams()
   const [categories, setCategories] = useState<Category[]>([])
   const [pinnedNews, setPinnedNews] = useState<NewsItem[]>([])
   const [recentNews, setRecentNews] = useState<NewsItem[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get('category'))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryTrigger, setRetryTrigger] = useState(0)
+
+  useEffect(() => {
+    const cat = searchParams.get('category')
+    setSelectedCategory(cat)
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
