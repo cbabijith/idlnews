@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useThemeStore } from '@/store/themeStore'
+import { BottomNavAd } from './BottomNavAd'
 
 export function BottomNavBar() {
   const { colors } = useThemeStore()
@@ -18,6 +19,11 @@ export function BottomNavBar() {
 
   return (
     <>
+      {/* Bottom Nav Ad Banner */}
+      <div className="fixed bottom-16 left-0 right-0 h-12 z-40 px-4 py-1 md:hidden">
+        <BottomNavAd />
+      </div>
+
       <nav className={`bg-surface font-label-caps text-label-caps fixed bottom-0 w-full z-50 border-t ${colors.outlineVariant} flex justify-around items-center h-16 px-4 md:hidden shadow-lg`}>
         <button onClick={handleComingSoon} className="flex flex-col items-center justify-center text-button font-bold hover:bg-surface-container-low transition-all active:scale-95 duration-150 w-full h-full bg-transparent border-none cursor-pointer">
           <span className="material-symbols-outlined mb-1">trending_up</span>

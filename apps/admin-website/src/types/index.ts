@@ -31,6 +31,20 @@ export interface Subcategory {
   updated_at: string
 }
 
+export type AdPosition = 'main_banner' | 'bottom_nav'
+
+export interface Ad {
+  id: string
+  title: string
+  image_url: string
+  link_url: string | null
+  position: AdPosition
+  is_active: boolean
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
 export interface News {
   id: string
   title: string
@@ -43,6 +57,7 @@ export interface News {
   is_published: boolean
   is_pinned: boolean
   published_at: string | null
+  view_count: number
   created_at: string
   updated_at: string
   created_by: string | null

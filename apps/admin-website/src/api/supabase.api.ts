@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/client'
-import { categoryRepository, newsRepository } from '@/repositories'
+import { adRepository, categoryRepository, newsRepository } from '@/repositories'
 import { uploadImageAction, deleteImageAction } from '@/app/actions/upload'
 
 // This layer provides a unified API interface for external calls
@@ -108,6 +108,7 @@ export const supabaseApi = {
   },
 
   // Database (delegates to repositories)
+  ads: adRepository,
   categories: categoryRepository,
   news: newsRepository,
 }

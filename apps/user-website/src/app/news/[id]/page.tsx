@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BottomNavBar } from '@/components/BottomNavBar'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { AdBanner } from '@/components/AdBanner'
+import { ShimmerBox } from '@/components/Shimmer'
 import { useThemeStore } from '@/store/themeStore'
 
 interface NewsItem {
@@ -17,6 +19,7 @@ interface NewsItem {
   youtube_link?: string
   published_at?: string
   is_pinned?: boolean
+  view_count?: number
   categories?: {
     name: string
     slug: string
@@ -43,6 +46,7 @@ export default function NewsDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryTrigger, setRetryTrigger] = useState(0)
+  const viewCountedRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     async function fetchNews() {
@@ -53,7 +57,7 @@ export default function NewsDetailPage() {
           Promise.resolve(
             supabase
               .from('news')
-              .select('id, title, content, description, image_url, youtube_link, published_at, is_pinned, categories(name, slug), profiles(full_name)')
+              .select('id, title, content, description, image_url, youtube_link, published_at, is_pinned, view_count, categories(name, slug), profiles(full_name)')
               .eq('id', params.id)
               .eq('is_published', true)
               .single()
@@ -63,6 +67,15 @@ export default function NewsDetailPage() {
 
         if (error) throw error
         setNews(data as unknown as NewsItem)
+
+        // Increment view count only once per news ID (prevents double counting in dev mode)
+        const newsId = params.id as string
+        if (newsId && !viewCountedRef.current.has(newsId)) {
+          viewCountedRef.current.add(newsId)
+          supabase.rpc('increment_news_view', { news_id: newsId }).then(({ error: rpcError }) => {
+            if (rpcError) console.error('Failed to increment view:', rpcError)
+          })
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load news')
       } finally {
@@ -119,8 +132,27 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-on-surface">Loading...</p>
+      <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
+        <Header />
+        <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-md flex flex-col gap-stack-md pb-32">
+          <div className="flex items-center gap-3">
+            <ShimmerBox className="h-8 w-24 rounded" />
+            <ShimmerBox className="h-8 w-32 rounded" />
+          </div>
+          <ShimmerBox className="w-full h-56 rounded-xl" />
+          <div className="flex flex-col gap-3">
+            <ShimmerBox className="h-6 w-3/4 rounded" />
+            <ShimmerBox className="h-4 w-full rounded" />
+            <ShimmerBox className="h-4 w-5/6 rounded" />
+            <ShimmerBox className="h-4 w-full rounded" />
+            <ShimmerBox className="h-4 w-2/3 rounded" />
+          </div>
+          <div className="flex justify-center">
+            <ShimmerBox className="h-12 w-40 rounded-full" />
+          </div>
+        </main>
+        <BottomNavBar />
+        <WhatsAppButton />
       </div>
     )
   }
@@ -156,7 +188,7 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
   const authorName = news.profile?.full_name || 'സ്റ്റാഫ് റിപ്പോർട്ടർ'
 
   return (
-    <div className={`min-h-screen ${colors.background} pb-[80px] md:pb-0`}>
+    <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
       <Header />
       
       <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-md flex flex-col gap-stack-md pb-32">
@@ -176,6 +208,15 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
             <span>{formattedDate}</span>
             <span className="text-outline">|</span>
             <span>{authorName}</span>
+            {news.view_count !== undefined && (
+              <>
+                <span className="text-outline">|</span>
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-base">visibility</span>
+                  {news.view_count} views
+                </span>
+              </>
+            )}
           </div>
         </article>
 
@@ -225,13 +266,18 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
             Share
           </button>
         </div>
+
+        {/* Ad Banners - Below Share Button */}
+        <div className="w-full max-w-3xl mx-auto">
+          <AdBanner maxAds={3} />
+        </div>
       </main>
 
       <BottomNavBar />
       <WhatsAppButton />
 
       {/* Footer */}
-      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-24 md:pb-stack-md">
+      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-32 md:pb-stack-md">
         <div className="font-headline-md text-headline-md text-primary-fixed">
           IDL NEWS
         </div>

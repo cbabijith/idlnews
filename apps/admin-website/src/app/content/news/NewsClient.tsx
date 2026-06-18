@@ -34,7 +34,7 @@ export function NewsClient({
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('')
-  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'category' | 'title-asc' | 'title-desc'>('date-desc')
+  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'category' | 'title-asc' | 'title-desc' | 'views-desc'>('date-desc')
 
   // Debounce search query
   useEffect(() => {
@@ -229,6 +229,7 @@ export function NewsClient({
               >
                 <option value="date-desc">Newest First</option>
                 <option value="date-asc">Oldest First</option>
+                <option value="views-desc">Most Viewed</option>
                 <option value="category">Category</option>
                 <option value="title-asc">Title (A to Z)</option>
                 <option value="title-desc">Title (Z to A)</option>
@@ -239,7 +240,8 @@ export function NewsClient({
         <div className={`text-xs ${colors.textSecondary} w-full lg:w-auto text-left lg:text-right mt-2 lg:mt-0 font-medium`}>
           Showing {newsItems.length} of {count} articles
         </div>
-      </div>      <div className="grid gap-4 pb-24">
+      </div>
+      <div className="grid gap-4 pb-24">
         {loading && newsItems.length === 0 ? (
           <p className={`${colors.textSecondary} text-center py-8`}>Loading news...</p>
         ) : newsItems.length === 0 ? (
@@ -277,6 +279,9 @@ export function NewsClient({
                           📌 Pinned
                         </span>
                       )}
+                      <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase bg-blue-100 text-blue-800 flex items-center gap-0.5">
+                        👁 {item.view_count || 0}
+                      </span>
                       <span suppressHydrationWarning className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
                         Created: {new Date(item.created_at).toLocaleDateString()}
                       </span>

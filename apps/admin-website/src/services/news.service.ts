@@ -43,6 +43,7 @@ export class NewsService {
       is_published: isPublished,
       is_pinned: isPinned,
       published_at: isPublished ? (publishedAt || new Date().toISOString()) : null,
+      view_count: 0,
     })
   }
 

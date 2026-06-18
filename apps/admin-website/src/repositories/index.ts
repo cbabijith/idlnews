@@ -1,3 +1,4 @@
+export { adRepository, AdRepository } from './ad.repository'
 export { categoryRepository, CategoryRepository } from './category.repository'
 export { newsRepository, NewsRepository } from './news.repository'
 export { profileRepository, ProfileRepository } from './profile.repository'

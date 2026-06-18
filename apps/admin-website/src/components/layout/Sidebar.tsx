@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useThemeStore } from '@/store/themeStore'
 import { useNavigationStore } from '@/store/navigationStore'
-import { LayoutDashboard, Newspaper, Folder, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Newspaper, Folder, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -15,6 +15,7 @@ export function Sidebar() {
     { href: '/', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/content/news', label: 'News', icon: Newspaper },
     { href: '/content/categories', label: 'Categories', icon: Folder },
+    { href: '/content/ads', label: 'Ads', icon: Megaphone },
   ]
 
   const handleNavClick = (href: string) => {

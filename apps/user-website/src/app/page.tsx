@@ -8,6 +8,8 @@ import { BreakingNewsTicker } from '@/components/BreakingNewsTicker'
 import { CategoryBar } from '@/components/CategoryBar'
 import { BottomNavBar } from '@/components/BottomNavBar'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { AdBanner } from '@/components/AdBanner'
+import { NewsCardShimmer, FeaturedNewsShimmer, DesktopFeaturedShimmer, SidebarNewsShimmer, TrendingCardShimmer, ShimmerBox } from '@/components/Shimmer'
 import { useThemeStore } from '@/store/themeStore'
 
 interface Category {
@@ -133,8 +135,37 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-on-surface">Loading...</p>
+      <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
+        <Header />
+        <div className="h-10 bg-surface-container border-b border-outline-variant" />
+        <div className="flex gap-2 px-4 py-3 overflow-hidden">
+          {[1,2,3,4,5].map(i => <ShimmerBox key={i} className="h-8 w-24 rounded-full flex-shrink-0" />)}
+        </div>
+
+        {/* Mobile Shimmer */}
+        <main className="block md:hidden px-4 py-4">
+          <FeaturedNewsShimmer />
+          <div className="mt-6 flex flex-col gap-3">
+            {[1,2,3,4,5].map(i => <NewsCardShimmer key={i} />)}
+          </div>
+        </main>
+
+        {/* Desktop Shimmer */}
+        <main className="hidden md:block max-w-container-max mx-auto px-8 py-6">
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-3 flex flex-col gap-3">
+              {[1,2,3,4,5].map(i => <SidebarNewsShimmer key={i} />)}
+            </div>
+            <div className="col-span-6">
+              <DesktopFeaturedShimmer />
+            </div>
+            <div className="col-span-3 flex flex-col gap-4">
+              {[1,2,3,4].map(i => <TrendingCardShimmer key={i} />)}
+            </div>
+          </div>
+        </main>
+
+        <BottomNavBar />
       </div>
     )
   }
@@ -157,7 +188,7 @@ export default function Home() {
   const latestNews = recentNews
 
   return (
-    <div className={`min-h-screen ${colors.background} pb-[80px] md:pb-0`}>
+    <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
       <Header pinnedNews={pinnedNews} />
       <BreakingNewsTicker pinnedNews={pinnedNews} latestNews={recentNews} />
       <CategoryBar categories={categories} selectedCategory={selectedCategory} onCategorySelect={setSelectedCategory} />
@@ -227,6 +258,11 @@ export default function Home() {
             </Link>
           </section>
         )}
+
+        {/* Mobile Ads - After Featured News */}
+        <section className="px-margin-mobile pb-stack-md">
+          <AdBanner maxAds={3} />
+        </section>
 
         {/* Latest News List */}
         <section className="px-margin-mobile pb-stack-lg">
@@ -457,12 +493,17 @@ export default function Home() {
                 </Link>
               ))}
             </div>
+
+            {/* Desktop Ads Sidebar */}
+            <div className="mt-6">
+              <AdBanner maxAds={3} />
+            </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-24 md:pb-stack-md">
+      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-32 md:pb-stack-md">
         <div className="font-headline-md text-headline-md text-primary-fixed">
           IDL NEWS
         </div>

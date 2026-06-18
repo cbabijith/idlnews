@@ -6,7 +6,7 @@ import { News } from '@/types'
 export interface SearchNewsParams {
   searchQuery?: string
   categoryId?: string
-  sortBy?: 'date-desc' | 'date-asc' | 'category' | 'title-asc' | 'title-desc'
+  sortBy?: 'date-desc' | 'date-asc' | 'category' | 'title-asc' | 'title-desc' | 'views-desc'
   limit: number
   offset: number
 }
@@ -50,6 +50,8 @@ export async function searchNewsAction({
       query = query.order('title', { ascending: false })
     } else if (sortBy === 'category') {
       query = query.order('category_id', { ascending: true })
+    } else if (sortBy === 'views-desc') {
+      query = query.order('view_count', { ascending: false })
     } else {
       query = query.order('created_at', { ascending: false })
     }
