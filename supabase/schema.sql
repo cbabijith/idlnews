@@ -387,14 +387,14 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION increment_news_view(UUID) TO anon;
 GRANT EXECUTE ON FUNCTION increment_news_view(UUID) TO authenticated;
 
--- Function to enforce single active ad for bottom_nav and popup_banner positions
+-- Function to enforce single active ad for bottom_nav position
 CREATE OR REPLACE FUNCTION enforce_single_active_ad()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.is_active = true AND NEW.position IN ('bottom_nav', 'popup_banner') THEN
+  IF NEW.is_active = true AND NEW.position = 'bottom_nav' THEN
     UPDATE ads
     SET is_active = false
-    WHERE position = NEW.position
+    WHERE position = 'bottom_nav'
       AND is_active = true
       AND id != NEW.id;
   END IF;

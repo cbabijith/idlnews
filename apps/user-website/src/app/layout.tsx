@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Archivo_Narrow, Be_Vietnam_Pro } from 'next/font/google'
 import './globals.css'
-import { PopupAd } from '@/components/PopupAd'
 
 const archivoNarrow = Archivo_Narrow({
   subsets: ['latin'],
@@ -30,10 +29,7 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
       </head>
-      <body className={`${archivoNarrow.variable} ${beVietnamPro.variable}`}>
-        {children}
-        <PopupAd />
-      </body>
+      <body className={`${archivoNarrow.variable} ${beVietnamPro.variable}`}>{children}</body>
     </html>
   )
 }
