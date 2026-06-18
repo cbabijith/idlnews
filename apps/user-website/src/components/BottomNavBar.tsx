@@ -19,8 +19,8 @@ export function BottomNavBar() {
 
   return (
     <>
-      {/* Bottom Nav Ad Banner */}
-      <div className="fixed bottom-16 left-0 right-0 h-12 z-40 px-4 py-1 md:hidden">
+      {/* Bottom Nav Ad Banner - Permanent Fixed Size */}
+      <div className="fixed bottom-16 left-0 right-0 h-12 z-40 px-2 md:hidden">
         <BottomNavAd />
       </div>
 

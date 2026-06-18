@@ -48,7 +48,7 @@ export function BottomNavAd() {
   }
 
   const content = (
-    <div className="relative w-full h-full rounded-md overflow-hidden border border-outline-variant bg-surface-container">
+    <div className="relative w-full h-12 flex items-center justify-center rounded-md overflow-hidden bg-surface-container flex-shrink-0">
       <img
         src={ad.image_url}
         alt={ad.title}
@@ -64,7 +64,7 @@ export function BottomNavAd() {
         href={ad.link_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block w-full h-full"
+        className="block w-full h-12 flex-shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
         {content}

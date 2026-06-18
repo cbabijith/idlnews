@@ -20,7 +20,8 @@ interface AdFormProps {
 
 const POSITIONS: { value: AdPosition; label: string }[] = [
   { value: 'main_banner', label: 'Main Banner (Home & News Pages)' },
-  { value: 'bottom_nav', label: 'Bottom Navigation Banner' },
+  { value: 'bottom_nav', label: 'Bottom Navigation Banner (Only 1 allowed)' },
+  { value: 'popup_banner', label: 'Popup Banner (Only 1 allowed)' },
 ]
 
 export function AdForm({ initialData = null, onSubmit, onCancel }: AdFormProps) {
@@ -139,7 +140,7 @@ export function AdForm({ initialData = null, onSubmit, onCancel }: AdFormProps) 
             ))}
           </select>
           <p className={`text-xs ${colors.textSecondary} mt-1`}>
-            Main Banner ads appear on the home and news pages. Bottom Nav banner appears inside the mobile bottom navigation.
+            Main Banner ads appear on the home and news pages. Bottom Nav banner appears in the mobile bottom navigation (only 1 active allowed). Popup Banner appears as a small popup on the user website (only 1 active allowed).
           </p>
         </div>
 

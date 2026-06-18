@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { adService } from '@/services'
+import { AdPosition } from '@/types'
 import { AdForm } from '@/components/forms/AdForm'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useThemeStore } from '@/store/themeStore'
@@ -14,7 +15,7 @@ export function NewAdClient() {
     title: string
     image_url: string
     link_url: string
-    position: 'main_banner' | 'bottom_nav'
+    position: AdPosition
     display_order: number
     is_active: boolean
   }) => {

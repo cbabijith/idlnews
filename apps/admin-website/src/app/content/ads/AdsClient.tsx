@@ -82,7 +82,9 @@ export function AdsClient() {
         <p className={`text-sm ${colors.textSecondary}`}>
           <strong>Main Banner</strong> ads appear on the home page and news detail pages (up to 2-3 banners recommended).
           <br />
-          <strong>Bottom Nav</strong> banner appears inside the mobile bottom navigation bar (only 1 recommended).
+          <strong>Bottom Nav</strong> banner appears inside the mobile bottom navigation bar (only 1 active allowed).
+          <br />
+          <strong>Popup Banner</strong> appears as a small popup on the user website (only 1 active allowed).
         </p>
       </div>
 
@@ -111,7 +113,7 @@ export function AdsClient() {
                       {ad.is_active ? 'Active' : 'Inactive'}
                     </span>
                     <span className={`text-[10px] sm:text-xs ${colors.textSecondary} uppercase font-semibold`}>
-                      {ad.position === 'main_banner' ? 'Main Banner' : 'Bottom Nav'}
+                      {ad.position === 'main_banner' ? 'Main Banner' : ad.position === 'bottom_nav' ? 'Bottom Nav' : 'Popup Banner'}
                     </span>
                     <span className={`text-[10px] sm:text-xs ${colors.textSecondary}`}>
                       Order: {ad.display_order}

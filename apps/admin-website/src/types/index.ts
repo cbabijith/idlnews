@@ -31,7 +31,7 @@ export interface Subcategory {
   updated_at: string
 }
 
-export type AdPosition = 'main_banner' | 'bottom_nav'
+export type AdPosition = 'main_banner' | 'bottom_nav' | 'popup_banner'
 
 export interface Ad {
   id: string
