@@ -189,6 +189,20 @@ export default function CategoriesPage() {
 
   return (
     <DashboardLayout>
+      <div className="flex sm:hidden justify-between items-center mb-6">
+        <h1 className={`text-2xl font-bold ${colors.text}`}>Categories</h1>
+        <button
+          onClick={() => {
+            setShowCategoryForm(true)
+            setEditingCategory(null)
+            setCategoryFormData({ name: '', slug: '' })
+          }}
+          className="px-4 py-2 bg-button text-white rounded-lg hover:opacity-90 text-sm"
+        >
+          + Add
+        </button>
+      </div>
+
       <div className="hidden sm:flex justify-between items-center mb-8">
         <h1 className={`text-4xl font-bold ${colors.text}`}>Categories</h1>
         <button
@@ -203,22 +217,10 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Floating Add Category Button for Mobile only */}
-      <button
-        onClick={() => {
-          setShowCategoryForm(true)
-          setEditingCategory(null)
-          setCategoryFormData({ name: '', slug: '' })
-        }}
-        className="sm:hidden fixed bottom-24 right-6 w-14 h-14 bg-button text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all z-40"
-        title="Add Category"
-      >
-        <span className="text-3xl font-light">+</span>
-      </button>
 
       {showCategoryForm && (
-        <div className={`${colors.card} p-6 rounded-lg shadow mb-8`}>
-          <h2 className={`text-2xl font-semibold mb-4 ${colors.text}`}>
+        <div className={`${colors.card} p-4 sm:p-6 rounded-lg shadow mb-6`}>
+          <h2 className={`text-xl sm:text-2xl font-semibold mb-4 ${colors.text}`}>
             {editingCategory ? 'Edit Category' : 'Add New Category'}
           </h2>
           <form onSubmit={handleCategorySubmit} className="space-y-4">
@@ -246,10 +248,10 @@ export default function CategoriesPage() {
               />
               <p className={`text-xs ${colors.textSecondary} mt-1`}>Slug is auto-generated from name</p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <button
                 type="submit"
-                className="px-6 py-3 bg-button text-white rounded-lg hover:opacity-90"
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-button text-white rounded-lg hover:opacity-90"
               >
                 {editingCategory ? 'Update' : 'Create'}
               </button>
@@ -260,7 +262,7 @@ export default function CategoriesPage() {
                   setEditingCategory(null)
                   setCategoryFormData({ name: '', slug: '' })
                 }}
-                className="px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400"
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400"
               >
                 Cancel
               </button>
@@ -270,8 +272,8 @@ export default function CategoriesPage() {
       )}
 
       {showSubcategoryForm && (
-        <div className={`${colors.card} p-6 rounded-lg shadow mb-8`}>
-          <h2 className={`text-2xl font-semibold mb-4 ${colors.text}`}>
+        <div className={`${colors.card} p-4 sm:p-6 rounded-lg shadow mb-6`}>
+          <h2 className={`text-xl sm:text-2xl font-semibold mb-4 ${colors.text}`}>
             {editingSubcategory ? 'Edit Subcategory' : 'Add New Subcategory'}
           </h2>
           <form onSubmit={handleSubcategorySubmit} className="space-y-4">
@@ -307,10 +309,10 @@ export default function CategoriesPage() {
                 placeholder="Subcategory description"
               />
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <button
                 type="submit"
-                className="px-6 py-3 bg-button text-white rounded-lg hover:opacity-90"
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-button text-white rounded-lg hover:opacity-90"
               >
                 {editingSubcategory ? 'Update' : 'Create'}
               </button>
@@ -322,7 +324,7 @@ export default function CategoriesPage() {
                   setSelectedCategoryId(null)
                   setSubcategoryFormData({ name: '', slug: '', description: '' })
                 }}
-                className="px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400"
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400"
               >
                 Cancel
               </button>
@@ -338,30 +340,30 @@ export default function CategoriesPage() {
           categories.map((category) => {
             const categorySubcategories = subcategories.filter(sub => sub.category_id === category.id)
             return (
-              <div key={category.id} className={`${colors.card} p-6 rounded-lg shadow`}>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1 cursor-pointer" onClick={() => toggleCategoryExpand(category.id)}>
+              <div key={category.id} className={`${colors.card} p-4 sm:p-6 rounded-lg shadow`}>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 cursor-pointer min-w-0" onClick={() => toggleCategoryExpand(category.id)}>
                     <div className="flex items-center gap-2">
-                      <span className={`text-lg ${colors.text}`}>
+                      <span className={`text-base sm:text-lg ${colors.text} flex-shrink-0`}>
                         {expandedCategories.has(category.id) ? '▼' : '▶'}
                       </span>
-                      <h3 className={`text-xl font-semibold ${colors.text}`}>{category.name}</h3>
+                      <h3 className={`text-lg sm:text-xl font-semibold ${colors.text} truncate`}>{category.name}</h3>
                     </div>
-                    <p className={`${colors.text} text-sm mb-2 ml-6`}>/{category.slug}</p>
+                    <p className={`${colors.text} text-xs sm:text-sm mb-1 sm:mb-2 ml-6 truncate`}>/{category.slug}</p>
                     {category.description && (
-                      <p className={`${colors.text} ml-6`}>{category.description}</p>
+                      <p className={`${colors.text} text-sm ml-6`}>{category.description}</p>
                     )}
                   </div>
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
                     <button
                       onClick={() => handleEditCategory(category)}
-                      className="px-4 py-2 bg-button text-white rounded hover:opacity-90"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-button text-white rounded hover:opacity-90 text-xs sm:text-sm"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
                     >
                       Delete
                     </button>
@@ -370,11 +372,11 @@ export default function CategoriesPage() {
                 
                 {expandedCategories.has(category.id) && (
                   <div className={`${colors.border} border-t pt-4 mt-4`}>
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className={`text-lg font-medium ${colors.text}`}>Subcategories ({categorySubcategories.length})</h4>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                      <h4 className={`text-base sm:text-lg font-medium ${colors.text}`}>Subcategories ({categorySubcategories.length})</h4>
                       <button
                         onClick={() => handleAddSubcategory(category.id)}
-                        className="px-4 py-2 bg-button text-white rounded hover:opacity-90 text-sm"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-button text-white rounded hover:opacity-90 text-xs sm:text-sm w-full sm:w-auto"
                       >
                         + Add Subcategory
                       </button>
@@ -385,24 +387,24 @@ export default function CategoriesPage() {
                     ) : (
                       <div className="space-y-2">
                         {categorySubcategories.map((sub) => (
-                          <div key={sub.id} className={`flex justify-between items-center p-3 ${colors.background} rounded`}>
-                            <div>
-                              <p className={`font-medium ${colors.text}`}>{sub.name}</p>
-                              <p className={`${colors.text} text-sm`}>/{sub.slug}</p>
+                          <div key={sub.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 ${colors.background} rounded`}>
+                            <div className="min-w-0">
+                              <p className={`font-medium ${colors.text} truncate`}>{sub.name}</p>
+                              <p className={`${colors.text} text-xs sm:text-sm truncate`}>/{sub.slug}</p>
                               {sub.description && (
-                                <p className={`${colors.text} text-sm`}>{sub.description}</p>
+                                <p className={`${colors.text} text-xs sm:text-sm`}>{sub.description}</p>
                               )}
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                               <button
                                 onClick={() => handleEditSubcategory(sub)}
-                                className="px-3 py-1 bg-button text-white rounded hover:opacity-90 text-sm"
+                                className="flex-1 sm:flex-none px-3 py-1 bg-button text-white rounded hover:opacity-90 text-xs sm:text-sm"
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleDeleteSubcategory(sub.id)}
-                                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                                className="flex-1 sm:flex-none px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
                               >
                                 Delete
                               </button>
