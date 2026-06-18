@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { categoryService, subcategoryService } from '@/services'
-import { Category, Subcategory } from '@/types'
+import { Category, Subcategory, ApiResponse } from '@/types'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useThemeStore } from '@/store/themeStore'
 
@@ -50,11 +50,17 @@ export default function CategoriesPage() {
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    let result
+    let result: ApiResponse<Category>
     if (editingCategory) {
       result = await categoryService.updateCategory(editingCategory.id, categoryFormData.name, undefined)
+      if (result.data) {
+        setCategories(prev => prev.map(c => c.id === editingCategory.id ? result.data! : c))
+      }
     } else {
       result = await categoryService.createCategory(categoryFormData.name, undefined)
+      if (result.data) {
+        setCategories(prev => [...prev, result.data!].sort((a, b) => a.name.localeCompare(b.name)))
+      }
     }
     
     if (result.error) {
@@ -65,7 +71,6 @@ export default function CategoriesPage() {
     setShowCategoryForm(false)
     setEditingCategory(null)
     setCategoryFormData({ name: '', slug: '' })
-    fetchCategories()
   }
 
   const handleSubcategorySubmit = async (e: React.FormEvent) => {
@@ -73,11 +78,17 @@ export default function CategoriesPage() {
     
     if (!selectedCategoryId) return
     
-    let result
+    let result: ApiResponse<Subcategory>
     if (editingSubcategory) {
       result = await subcategoryService.updateSubcategory(editingSubcategory.id, subcategoryFormData.name, subcategoryFormData.description)
+      if (result.data) {
+        setSubcategories(prev => prev.map(s => s.id === editingSubcategory.id ? result.data! : s))
+      }
     } else {
       result = await subcategoryService.createSubcategory(selectedCategoryId, subcategoryFormData.name, subcategoryFormData.description)
+      if (result.data) {
+        setSubcategories(prev => [...prev, result.data!].sort((a, b) => a.name.localeCompare(b.name)))
+      }
     }
     
     if (result.error) {
@@ -89,7 +100,6 @@ export default function CategoriesPage() {
     setEditingSubcategory(null)
     setSelectedCategoryId(null)
     setSubcategoryFormData({ name: '', slug: '', description: '' })
-    fetchSubcategories()
   }
 
   const handleEditCategory = (category: Category) => {
@@ -109,8 +119,8 @@ export default function CategoriesPage() {
       alert(result.error)
       return
     }
-    fetchCategories()
-    fetchSubcategories()
+    setCategories(prev => prev.filter(c => c.id !== id))
+    setSubcategories(prev => prev.filter(s => s.category_id !== id))
   }
 
   const handleAddSubcategory = (categoryId: string) => {
@@ -139,7 +149,7 @@ export default function CategoriesPage() {
       alert(result.error)
       return
     }
-    fetchSubcategories()
+    setSubcategories(prev => prev.filter(s => s.id !== id))
   }
 
   const generateSlug = (name: string) => {

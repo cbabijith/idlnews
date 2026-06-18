@@ -94,23 +94,29 @@ export function NewsClient({
     setLoadingMore(false)
   }
 
-  // Scroll listener for infinite scroll
+  // Scroll listener for infinite scroll (throttled)
   useEffect(() => {
+    let ticking = false
     const handleScroll = () => {
-      if (typeof window === 'undefined') return
-      
-      const threshold = 100
-      const position = window.innerHeight + window.scrollY
-      const height = document.documentElement.scrollHeight
-      
-      if (position >= height - threshold && hasMore && !loadingMore && !loading) {
-        loadMoreNews()
-      }
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        if (typeof window === 'undefined') return
+        
+        const threshold = 100
+        const position = window.innerHeight + window.scrollY
+        const height = document.documentElement.scrollHeight
+        
+        if (position >= height - threshold && hasMore && !loadingMore && !loading) {
+          loadMoreNews()
+        }
+        ticking = false
+      })
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [hasMore, loadingMore, loading, newsItems.length, debouncedSearchQuery, filterCategory, sortBy])
+  }, [hasMore, loadingMore, loading, newsItems.length])
 
   const refreshNews = async () => {
     const currentLimit = Math.max(10, newsItems.length)
@@ -156,7 +162,9 @@ export function NewsClient({
       alert(result.error)
       return
     }
-    refreshNews()
+    setNewsItems(prev => prev.map(item =>
+      item.id === news.id ? { ...item, is_published: !item.is_published } : item
+    ))
   }
 
   const togglePin = async (news: News) => {
@@ -165,7 +173,9 @@ export function NewsClient({
       alert(result.error)
       return
     }
-    refreshNews()
+    setNewsItems(prev => prev.map(item =>
+      item.id === news.id ? { ...item, is_pinned: !item.is_pinned } : item
+    ))
   }
 
   return (
@@ -257,6 +267,7 @@ export function NewsClient({
                       src={item.image_url}
                       alt={item.title}
                       className="w-full h-full object-cover absolute inset-0"
+                      loading="lazy"
                     />
                   </div>
                 ) : (

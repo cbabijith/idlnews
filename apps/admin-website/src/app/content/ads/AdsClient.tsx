@@ -33,7 +33,9 @@ export function AdsClient() {
       alert(result.error)
       return
     }
-    fetchAds()
+    setAds(prev => prev.map(item =>
+      item.id === ad.id ? { ...item, is_active: !item.is_active } : item
+    ))
   }
 
   const performDelete = async (id: string) => {
@@ -99,6 +101,7 @@ export function AdsClient() {
                   src={ad.image_url}
                   alt={ad.title}
                   className="w-full h-full object-cover absolute inset-0"
+                  loading="lazy"
                 />
               </div>
 
