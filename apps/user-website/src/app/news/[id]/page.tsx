@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import supabase from '@idlnews/shared-supabase'
 import { Header } from '@/components/Header'
 import { BottomNavBar } from '@/components/BottomNavBar'
-import { WhatsAppButton } from '@/components/WhatsAppButton'
+import { ShareButton } from '@/components/ShareButton'
 import { AdBanner } from '@/components/AdBanner'
 import { ShimmerBox } from '@/components/Shimmer'
+import { Footer } from '@/components/Footer'
 import { useThemeStore } from '@/store/themeStore'
 
 interface NewsItem {
@@ -29,6 +31,16 @@ interface NewsItem {
   }
 }
 
+interface RelatedNews {
+  id: string
+  title: string
+  image_url?: string
+  published_at?: string
+  categories?: {
+    name: string
+  }
+}
+
 function withTimeout<T>(promise: Promise<T>, ms = 8000): Promise<T> {
   return Promise.race([
     promise,
@@ -43,6 +55,7 @@ export default function NewsDetailPage() {
   const params = useParams()
   const router = useRouter()
   const [news, setNews] = useState<NewsItem | null>(null)
+  const [relatedNews, setRelatedNews] = useState<RelatedNews[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryTrigger, setRetryTrigger] = useState(0)
@@ -62,11 +75,12 @@ export default function NewsDetailPage() {
               .eq('is_published', true)
               .single()
           ),
-          8000
+          5000
         )
 
         if (error) throw error
-        setNews(data as unknown as NewsItem)
+        const newsData = data as unknown as NewsItem
+        setNews(newsData)
 
         // Increment view count only once per news ID (prevents double counting in dev mode)
         const newsId = params.id as string
@@ -75,6 +89,18 @@ export default function NewsDetailPage() {
           supabase.rpc('increment_news_view', { news_id: newsId }).then(({ error: rpcError }) => {
             if (rpcError) console.error('Failed to increment view:', rpcError)
           })
+        }
+
+        // Fetch related news from same category
+        if (newsData.categories?.slug) {
+          const { data: related } = await supabase
+            .from('news')
+            .select('id, title, image_url, published_at, categories(name)')
+            .eq('is_published', true)
+            .neq('id', newsId)
+            .order('published_at', { ascending: false })
+            .limit(4)
+          if (related) setRelatedNews(related as unknown as RelatedNews[])
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load news')
@@ -88,91 +114,137 @@ export default function NewsDetailPage() {
     }
   }, [params.id, retryTrigger])
 
-  const handleShare = () => {
-    if (typeof window !== 'undefined' && news) {
-      const category = news.categories?.name || 'ബ്രേക്കിംഗ് ന്യൂസ്'
-      const description = news.description || news.content?.replace(/<[^>]*>/g, '').substring(0, 200) || ''
-      const newsUrl = window.location.href
-      const publishedDate = news.published_at
-        ? new Date(news.published_at).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : ''
-      
-      const shareText = `📰 IDL NEWS | ${category}
+  const handleShare = async () => {
+    if (typeof window === 'undefined' || !news) return
 
-✍️ ${news.title}
+    const category = news.categories?.name || 'ബ്രേക്കിംഗ് ന്യൂസ്'
+
+    const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim()
+    let description = news.description ? stripHtml(news.description) : (news.content ? stripHtml(news.content) : '')
+    if (description.length > 150) {
+      description = description.substring(0, 150).trim() + '...'
+    }
+
+    const newsUrl = window.location.href
+    const publishedDate = news.published_at
+      ? new Date(news.published_at).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : ''
+
+    const shareText = `📰 *IDL NEWS* | ${category}
+
+✍️ *${news.title}*
 
 ${description}
 
 👉 *മുഴുവൻ വാർത്ത വായിക്കാൻ:*
 ${newsUrl}
 
-📅 Published: ${publishedDate}
+📅 ${publishedDate}
 
 ━━━━━━━━━━━━━━━
 
-📲 IDL NEWS വാട്സ്ആപ്പ് ചാനലിൽ ചേരൂ
+📲 *IDL NEWS വാട്സ്ആപ്പ് ചാനലിൽ ചേരൂ*
 
 കേരളത്തിലെയും ലോകത്തെയും പ്രധാന വാർത്തകൾ, ബ്രേക്കിംഗ് അപ്ഡേറ്റുകൾ, പ്രത്യേക റിപ്പോർട്ടുകൾ എന്നിവ അതിവേഗം ലഭിക്കാൻ ഞങ്ങളുടെ വാട്സ്ആപ്പ് ചാനലിൽ ഇപ്പോൾ തന്നെ ജോയിൻ ചെയ്യൂ
 
-👇 ചാനലിൽ ചേരാൻ
+👇 *ചാനലിൽ ചേരാൻ*
 https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
 
 ━━━━━━━━━━━━━━━
-*IDL NEWS
-സത്യസന്ധവും വേഗമേറിയതുമായ വാർത്തകൾ* 🌐www.idlnews.com`
-      
+*IDL NEWS*
+സത്യസന്ധവും വേഗമേറിയതുമായ വാർത്തകൾ 🌐 www.idlnews.com`
+
+    const fallbackToWhatsApp = () => {
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`
       window.open(whatsappUrl, '_blank')
     }
+
+    const canShareFiles = typeof navigator !== 'undefined' && typeof navigator.share === 'function' && typeof navigator.canShare === 'function'
+
+    if (canShareFiles && news.image_url) {
+      try {
+        const response = await fetch(news.image_url)
+        const blob = await response.blob()
+        const file = new File([blob], 'idlnews.jpg', { type: blob.type || 'image/jpeg' })
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            text: shareText,
+            files: [file],
+          })
+          return
+        }
+      } catch (err) {
+        console.error('Web Share with image failed, falling back:', err)
+      }
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ text: shareText })
+        return
+      } catch (err) {
+        console.error('Web Share text failed, falling back:', err)
+      }
+    }
+
+    fallbackToWhatsApp()
   }
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
+      <div className={`min-h-screen ${colors.background}`}>
         <Header />
-        <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-md flex flex-col gap-stack-md pb-32">
-          <div className="flex items-center gap-3">
-            <ShimmerBox className="h-8 w-24 rounded" />
-            <ShimmerBox className="h-8 w-32 rounded" />
+        <main className="w-full max-w-[700px] mx-auto px-4 md:px-6 pt-4 pb-8 flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <ShimmerBox className="h-4 w-4 rounded" />
+            <ShimmerBox className="h-3 w-16 rounded" />
           </div>
-          <ShimmerBox className="w-full h-56 rounded-xl" />
-          <div className="flex flex-col gap-3">
-            <ShimmerBox className="h-6 w-3/4 rounded" />
-            <ShimmerBox className="h-4 w-full rounded" />
-            <ShimmerBox className="h-4 w-5/6 rounded" />
-            <ShimmerBox className="h-4 w-full rounded" />
-            <ShimmerBox className="h-4 w-2/3 rounded" />
+          <div className="flex flex-col gap-2">
+            <ShimmerBox className="h-5 w-full rounded" />
+            <ShimmerBox className="h-5 w-4/5 rounded" />
           </div>
-          <div className="flex justify-center">
-            <ShimmerBox className="h-12 w-40 rounded-full" />
+          <div className="flex items-center gap-2">
+            <ShimmerBox className="h-3 w-24 rounded" />
+            <ShimmerBox className="h-3 w-16 rounded" />
+          </div>
+          <ShimmerBox className="w-full aspect-[16/9] rounded-xl" />
+          <div className="flex flex-col gap-2.5 mt-2">
+            <ShimmerBox className="h-3.5 w-full rounded" />
+            <ShimmerBox className="h-3.5 w-full rounded" />
+            <ShimmerBox className="h-3.5 w-11/12 rounded" />
+            <ShimmerBox className="h-3.5 w-full rounded" />
+            <ShimmerBox className="h-3.5 w-3/4 rounded" />
           </div>
         </main>
         <BottomNavBar />
-        <WhatsAppButton />
       </div>
     )
   }
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-center">
-        <p className="text-error mb-4 font-medium max-w-md">{error || 'News article not found'}</p>
-        <button
-          onClick={() => setRetryTrigger(prev => prev + 1)}
-          className="px-6 py-2.5 bg-button text-on-primary rounded-lg font-medium hover:opacity-90 transition-all shadow-md mb-3"
-        >
-          Retry Loading
-        </button>
-        <button
-          onClick={() => router.push('/')}
-          className="px-6 py-2 bg-surfaceContainerLowest border border-outlineVariant text-on-surface rounded-lg font-medium hover:opacity-90 transition-all shadow-sm"
-        >
-          Go Back Home
-        </button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center gap-4">
+        <span className="material-symbols-outlined text-6xl text-on-surface-variant opacity-40">error_outline</span>
+        <p className="text-on-surface-variant max-w-md text-sm">{error || 'News article not found'}</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setRetryTrigger(prev => prev + 1)}
+            className="px-5 py-2.5 bg-button text-on-primary rounded-lg font-medium hover:bg-button-hover transition-all text-sm"
+          >
+            Retry
+          </button>
+          <button
+            onClick={() => router.push('/')}
+            className="px-5 py-2.5 border border-outline-variant text-on-surface rounded-lg font-medium hover:bg-surface-container transition-all text-sm"
+          >
+            Home
+          </button>
+        </div>
       </div>
     )
   }
@@ -186,46 +258,64 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
     : ''
 
   const authorName = news.profile?.full_name || 'സ്റ്റാഫ് റിപ്പോർട്ടർ'
+  const formatDateShort = (date: string) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 
   return (
-    <div className={`min-h-screen ${colors.background} pb-[128px] md:pb-0`}>
+    <div className={`min-h-screen ${colors.background}`}>
       <Header />
       
-      <main className="w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-stack-md flex flex-col gap-stack-md pb-32">
-        {/* Header Section */}
-        <article className="flex flex-col gap-stack-sm">
-          <div className="flex items-center gap-base">
-            {news.categories && (
-              <span className="bg-primary-container text-on-primary-container font-label-category text-label-category px-3 py-1 rounded-DEFAULT inline-block w-max">
-                {news.categories.name}
+      <main className="w-full max-w-[700px] mx-auto px-4 md:px-6 pt-3 md:pt-5 pb-8 flex flex-col gap-3 md:gap-4">
+        {/* Back + Category Row */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-1 text-on-surface-variant text-[12px] font-medium hover:text-on-surface transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            തിരികെ
+          </button>
+          {news.categories && (
+            <span className="text-secondary text-[10px] font-semibold uppercase tracking-wide">
+              {news.categories.name}
+            </span>
+          )}
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-[20px] md:text-[28px] font-bold leading-[1.35] text-on-surface">
+          {news.title}
+        </h1>
+
+        {/* Metadata Row */}
+        <div className="flex items-center gap-2 text-[11px] text-on-surface-variant">
+          {news.published_at && (
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px]">schedule</span>
+              {formattedDate}
+            </span>
+          )}
+          <span className="w-1 h-1 rounded-full bg-outline"></span>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-[13px]">person</span>
+            {authorName}
+          </span>
+          {news.view_count !== undefined && news.view_count > 0 && (
+            <>
+              <span className="w-1 h-1 rounded-full bg-outline"></span>
+              <span className="flex items-center gap-1">
+                <span className="material-symbols-outlined text-[13px]">visibility</span>
+                {news.view_count}
               </span>
-            )}
-          </div>
-          <h1 className="font-display-hero-mobile text-display-hero-mobile md:font-display-hero md:text-display-hero text-on-surface">
-            {news.title}
-          </h1>
-          <div className="text-on-surface-variant font-label-category text-label-category flex items-center gap-2 flex-wrap">
-            <span>{formattedDate}</span>
-            <span className="text-outline">|</span>
-            <span>{authorName}</span>
-            {news.view_count !== undefined && (
-              <>
-                <span className="text-outline">|</span>
-                <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-base">visibility</span>
-                  {news.view_count} views
-                </span>
-              </>
-            )}
-          </div>
-        </article>
+            </>
+          )}
+        </div>
 
         {/* Featured Image */}
         {news.image_url && (
-          <div className="w-full aspect-[16/9] bg-surface-container rounded-lg overflow-hidden border border-outline-variant relative group">
+          <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-surface-container mt-1">
             <img
               alt={news.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover"
               src={news.image_url}
             />
           </div>
@@ -233,7 +323,7 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
 
         {/* YouTube Video */}
         {news.youtube_link && (
-          <div className="w-full aspect-video bg-surface-container rounded-lg overflow-hidden border border-outline-variant">
+          <div className="w-full aspect-video rounded-xl overflow-hidden bg-black mt-1">
             <iframe
               className="w-full h-full"
               src={news.youtube_link.replace('watch?v=', 'embed/')}
@@ -245,63 +335,63 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
         )}
 
         {/* Article Content */}
-        <div className="flex flex-col gap-stack-md font-body-lg text-body-lg text-on-surface-variant max-w-3xl mx-auto leading-relaxed w-full">
+        <article className="w-full mt-2">
           {news.description && (
-            <p className="font-semibold text-on-surface">{news.description}</p>
+            <div className="border-l-[3px] border-secondary pl-4 mb-5">
+              <p className="font-semibold text-on-surface text-[15px] md:text-[16px] leading-relaxed" style={{ textAlign: 'justify', textAlignLast: 'left', textJustify: 'inter-word', wordSpacing: '0.05em' }}>{news.description}</p>
+            </div>
           )}
           {news.content && (
             <div dangerouslySetInnerHTML={{ __html: news.content }} />
           )}
-        </div>
+        </article>
 
-        {/* Share Action */}
-        <div className="mt-stack-lg flex justify-center">
-          <button
-            onClick={handleShare}
-            className="bg-button text-on-primary font-label-category text-label-category px-6 py-3 rounded-full flex items-center gap-2 hover:bg-button-hover transition-all active:scale-95 duration-150 shadow-md hover:shadow-lg border border-transparent"
-          >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: 'FILL 1' }}>
-              share
-            </span>
-            Share
-          </button>
-        </div>
-
-        {/* Ad Banners - Below Share Button */}
-        <div className="w-full max-w-3xl mx-auto">
+        {/* Ad Banners */}
+        <div className="w-full pt-2">
           <AdBanner maxAds={3} />
         </div>
+
+        {/* Related Articles */}
+        {relatedNews.length > 0 && (
+          <section className="w-full pt-4">
+            <h3 className="text-on-surface text-[14px] font-bold mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-button rounded-full"></span>
+              ബന്ധപ്പെട്ട വാർത്തകൾ
+            </h3>
+            <div className="flex flex-col">
+              {relatedNews.map((item, index) => (
+                <Link key={item.id} href={`/news/${item.id}`} className="block group">
+                  <div className={`flex gap-3 py-2.5 ${index !== relatedNews.length - 1 ? 'border-b border-outline-variant' : ''}`}>
+                    {item.image_url && (
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
+                        className="w-14 h-14 object-cover rounded-md flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex flex-col justify-center flex-1 min-w-0 gap-1">
+                      <h4 className="text-[13px] font-medium text-on-surface line-clamp-2 leading-snug group-hover:text-button transition-colors">
+                        {item.title}
+                      </h4>
+                      {item.published_at && (
+                        <span className="text-on-surface-variant text-[10px] flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[11px]">schedule</span>
+                          {formatDateShort(item.published_at)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <BottomNavBar />
-      <WhatsAppButton />
+      <ShareButton onShare={handleShare} />
 
-      {/* Footer */}
-      <footer className="bg-inverse-surface text-primary-fixed font-body-md text-body-md w-full mt-auto flex flex-col items-center gap-stack-md p-stack-md text-center pb-32 md:pb-stack-md">
-        <div className="font-headline-md text-headline-md text-primary-fixed">
-          IDL NEWS
-        </div>
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
-            ഞങ്ങളെക്കുറിച്ച്
-          </a>
-          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
-            പരസ്യം
-          </a>
-          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
-            സ്വകാര്യതാ നയം
-          </a>
-          <a className="text-inverse-on-surface opacity-80 hover:text-secondary-fixed transition-colors cursor-pointer" href="#">
-            സമ്പർക്കം
-          </a>
-        </div>
-        <p className="text-inverse-on-surface opacity-60 text-sm mt-4">
-          © 2024 IDL വാർത്തകൾ. All rights reserved.
-        </p>
-        <p className="text-inverse-on-surface opacity-50 text-xs mt-1">
-          Made by <a href="https://abijithcb.com" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-secondary-fixed transition-colors">abijithcb.com</a>
-        </p>
-      </footer>
+      <Footer />
     </div>
   )
 }

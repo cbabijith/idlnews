@@ -9,40 +9,92 @@
   }
   
   /* HTML content styling */
-  article strong, article b {
-    @apply font-bold;
+  article {
+    @apply text-on-surface-variant;
+    font-size: 15px;
+    line-height: 1.85;
+    letter-spacing: 0.01em;
   }
-  
+
+  article strong, article b {
+    @apply font-bold text-on-surface;
+  }
+
   article em, article i {
     @apply italic;
   }
-  
+
   article ul, article ol {
-    @apply list-inside my-4;
+    @apply list-inside my-4 pl-2;
   }
-  
+
   article ul {
     @apply list-disc;
   }
-  
+
   article ol {
     @apply list-decimal;
   }
-  
+
   article li {
-    @apply my-2;
+    @apply my-1.5 leading-relaxed;
   }
-  
+
   article p {
+    @apply my-3;
+    text-align: justify;
+    text-align-last: left;
+    text-justify: inter-word;
+    word-spacing: 0.05em;
+  }
+
+  article h1, article h2, article h3, article h4 {
+    @apply font-bold text-on-surface mt-5 mb-2;
+  }
+
+  article h1 { font-size: 18px; }
+  article h2 { font-size: 17px; }
+  article h3 { font-size: 16px; }
+  article h4 { font-size: 15px; }
+
+  article br {
+    display: none;
+  }
+
+  article a {
+    @apply text-primary underline underline-offset-2;
+  }
+
+  article blockquote {
+    @apply border-l-4 border-primary pl-4 py-1 italic my-4 text-on-surface-variant;
+  }
+
+  article img {
+    @apply rounded-lg my-4 w-full;
+  }
+
+  article figure {
     @apply my-4;
   }
-  
-  article a {
-    @apply text-primary underline;
+
+  article figcaption {
+    @apply text-center text-xs text-on-surface-variant mt-2 italic;
   }
-  
-  article blockquote {
-    @apply border-l-4 border-primary pl-4 italic my-4;
+
+  article table {
+    @apply w-full my-4 border-collapse text-sm;
+  }
+
+  article th, article td {
+    @apply border border-outline-variant px-3 py-2 text-left;
+  }
+
+  article th {
+    @apply bg-surface-container font-semibold text-on-surface;
+  }
+
+  article hr {
+    @apply my-6 border-outline-variant;
   }
 }
 
@@ -63,7 +115,22 @@
   .animate-marquee {
     display: flex;
     width: max-content;
-    animation: marquee 35s linear infinite;
+    animation: marquee 102s linear infinite;
+  }
+
+  .animate-breaking-marquee {
+    display: flex;
+    width: max-content;
+    animation: breaking-marquee 102s linear infinite;
+  }
+
+  .animate-breaking-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes breaking-marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
   }
   
   @keyframes marquee {

@@ -18,14 +18,14 @@ export function CategoryBar({ categories, selectedCategory, onCategorySelect }: 
   const { colors } = useThemeStore()
 
   return (
-    <nav className={`bg-surface border-b ${colors.outlineVariant} overflow-x-auto no-scrollbar`}>
-      <div className="flex space-x-2 px-margin-mobile md:px-4 py-3 min-w-max md:justify-center md:min-w-0 max-w-container-max mx-auto">
+    <nav className={`bg-surface border-b ${colors.outlineVariant} overflow-x-auto no-scrollbar sticky top-16 z-30`}>
+      <div className="flex gap-2 px-4 py-2.5 min-w-max md:justify-center md:min-w-0 max-w-[1200px] mx-auto">
         <button
           onClick={() => onCategorySelect(null)}
-          className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-all shadow-sm ${
+          className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${
             selectedCategory === null
-              ? 'bg-button text-on-primary shadow-md'
-              : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
+              ? 'bg-button text-on-primary'
+              : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high'
           }`}
         >
           All
@@ -35,10 +35,10 @@ export function CategoryBar({ categories, selectedCategory, onCategorySelect }: 
             <button
               key={category.id}
               onClick={() => onCategorySelect(category.id)}
-              className={`px-4 py-1.5 rounded-full font-label-category text-label-category transition-all shadow-sm ${
+              className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${
                 selectedCategory === category.id
-                  ? 'bg-button text-on-primary shadow-md'
-                  : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
+                  ? 'bg-button text-on-primary'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high'
               }`}
             >
               {category.name}

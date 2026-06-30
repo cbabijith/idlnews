@@ -51,7 +51,7 @@ export function AdBanner({ maxAds = 3, className = '' }: AdBannerProps) {
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         {ads.map((ad) => (
           <AdBannerItem key={ad.id} ad={ad} />
         ))}
@@ -62,15 +62,15 @@ export function AdBanner({ maxAds = 3, className = '' }: AdBannerProps) {
 
 function AdBannerItem({ ad }: { ad: Ad }) {
   const content = (
-    <div className="relative w-full rounded-xl overflow-hidden border border-outline-variant shadow-sm hover:shadow-md transition-shadow duration-300 bg-surface-container">
+    <div className="relative w-full rounded-lg overflow-hidden bg-surface-container group">
       <img
         src={ad.image_url}
         alt={ad.title}
         className="w-full h-auto object-cover"
         loading="lazy"
       />
-      <span className="absolute top-1 right-1 text-[9px] bg-surface/80 text-on-surface-variant px-1.5 py-0.5 rounded">
-        Ad
+      <span className="absolute top-1.5 right-1.5 text-[8px] font-medium uppercase tracking-wider bg-black/40 backdrop-blur-sm text-white/80 px-1.5 py-0.5 rounded">
+        Sponsored
       </span>
     </div>
   )
