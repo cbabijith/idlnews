@@ -38,11 +38,11 @@ export async function searchNewsAction({
     // Apply sorting
     if (sortBy === 'date-desc') {
       query = query
-        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('published_at', { ascending: false, nullsFirst: true })
         .order('created_at', { ascending: false })
     } else if (sortBy === 'date-asc') {
       query = query
-        .order('published_at', { ascending: true, nullsFirst: false })
+        .order('published_at', { ascending: true, nullsFirst: true })
         .order('created_at', { ascending: true })
     } else if (sortBy === 'title-asc') {
       query = query.order('title', { ascending: true })

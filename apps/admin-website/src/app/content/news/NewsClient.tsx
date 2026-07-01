@@ -35,6 +35,7 @@ export function NewsClient({
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('')
   const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'category' | 'title-asc' | 'title-desc' | 'views-desc'>('date-desc')
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   // Debounce search query
   useEffect(() => {
@@ -200,9 +201,10 @@ export function NewsClient({
       </Link>
 
       {/* Filtering and Sorting Controls */}
-      <div className={`flex flex-col lg:flex-row gap-4 p-4 mb-6 rounded-lg ${colors.card} shadow-sm border border-gray-100 justify-between items-center`}>
-        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto flex-1">
-          <div className="w-full sm:max-w-md">
+      <div className={`p-4 mb-6 rounded-lg ${colors.card} shadow-sm border border-gray-100`}>
+        {/* Search Row */}
+        <div className="flex items-end gap-2 w-full">
+          <div className="flex-1">
             <label className={`block text-[10px] font-semibold uppercase tracking-wider mb-1 ${colors.textSecondary}`}>Search News</label>
             <div className="relative">
               <input
@@ -210,19 +212,37 @@ export function NewsClient({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by title, description or content..."
-                className={`w-full p-2 pl-8 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent`}
+                className={`w-full p-2.5 pl-9 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent outline-none focus:ring-1 focus:ring-button`}
               />
-              <span className="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
+              <span className="absolute left-3 top-3 text-gray-400 text-sm">🔍</span>
             </div>
           </div>
           
-          <div className="flex gap-3 w-full sm:w-auto flex-1 sm:flex-none">
-            <div className="flex-1 sm:w-[180px] sm:flex-none">
+          {/* Mobile Filter Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className={`sm:hidden p-2.5 rounded-lg border ${colors.border} ${colors.text} hover:bg-gray-50 flex items-center justify-center gap-1.5 min-w-[44px] h-[42px] transition-all`}
+            title="Toggle Filters"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-gray-500">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+            </svg>
+            {(filterCategory || sortBy !== 'date-desc') && (
+              <span className="w-2.5 h-2.5 rounded-full bg-button border border-white"></span>
+            )}
+          </button>
+        </div>
+
+        {/* Desktop Filter Options & Collapsible Mobile Options */}
+        <div className={`${showMobileFilters ? 'flex' : 'hidden'} sm:flex flex-col sm:flex-row gap-4 mt-4 pt-4 border-t border-gray-100 w-full justify-between items-center`}>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
+            <div className="w-full sm:w-[200px]">
               <label className={`block text-[10px] font-semibold uppercase tracking-wider mb-1 ${colors.textSecondary}`}>Filter by Category</label>
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className={`w-full p-2 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent`}
+                className={`w-full p-2.5 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent outline-none focus:ring-1 focus:ring-button`}
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -230,12 +250,12 @@ export function NewsClient({
                 ))}
               </select>
             </div>
-            <div className="flex-1 sm:w-[180px] sm:flex-none">
+            <div className="w-full sm:w-[200px]">
               <label className={`block text-[10px] font-semibold uppercase tracking-wider mb-1 ${colors.textSecondary}`}>Sort by</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className={`w-full p-2 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent`}
+                className={`w-full p-2.5 text-sm ${colors.border} rounded-lg ${colors.text} bg-transparent outline-none focus:ring-1 focus:ring-button`}
               >
                 <option value="date-desc">Newest First</option>
                 <option value="date-asc">Oldest First</option>
@@ -246,9 +266,10 @@ export function NewsClient({
               </select>
             </div>
           </div>
-        </div>
-        <div className={`text-xs ${colors.textSecondary} w-full lg:w-auto text-left lg:text-right mt-2 lg:mt-0 font-medium`}>
-          Showing {newsItems.length} of {count} articles
+          
+          <div className={`text-xs ${colors.textSecondary} w-full sm:w-auto text-left sm:text-right font-medium`}>
+            Showing {newsItems.length} of {count} articles
+          </div>
         </div>
       </div>
       <div className="grid gap-4 pb-24">
@@ -259,10 +280,10 @@ export function NewsClient({
         ) : (
           <>
             {newsItems.map((item) => (
-              <div key={item.id} className={`${colors.card} rounded-lg shadow overflow-hidden h-40 sm:h-48 flex flex-row`}>
-                {/* Fixed Image Container */}
+              <div key={item.id} className={`${colors.card} rounded-lg shadow overflow-hidden flex flex-col sm:flex-row sm:h-48 transition-all duration-200 border border-gray-100 hover:shadow-md`}>
+                {/* Responsive Image Container */}
                 {item.image_url ? (
-                  <div className="w-28 sm:w-48 h-full flex-shrink-0 relative bg-gray-100">
+                  <div className="w-full h-44 sm:w-48 sm:h-full flex-shrink-0 relative bg-gray-100">
                     <img
                       src={item.image_url}
                       alt={item.title}
@@ -271,13 +292,13 @@ export function NewsClient({
                     />
                   </div>
                 ) : (
-                  <div className="w-28 sm:w-48 h-full flex-shrink-0 bg-gray-100 flex items-center justify-center text-gray-400">
+                  <div className="w-full h-24 sm:w-48 sm:h-full flex-shrink-0 bg-gray-50 flex items-center justify-center text-gray-400 border-b sm:border-b-0 sm:border-r border-gray-100">
                     <span className="material-symbols-outlined text-4xl">image</span>
                   </div>
                 )}
 
                 {/* Content Area */}
-                <div className="flex-1 p-3 sm:p-5 flex flex-col justify-between min-w-0">
+                <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between min-w-0">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span className={`px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase ${
@@ -293,29 +314,21 @@ export function NewsClient({
                       <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase bg-blue-100 text-blue-800 flex items-center gap-0.5">
                         👁 {item.view_count || 0}
                       </span>
-                      <span suppressHydrationWarning className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
-                        Created: {new Date(item.created_at).toLocaleDateString()}
+                      <span suppressHydrationWarning className={`text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Created: ${new Date(item.created_at).toLocaleString()}`}>
+                        {new Date(item.created_at).toLocaleDateString()}
                       </span>
-                      <span suppressHydrationWarning className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary}`} title={`Updated: ${new Date(item.updated_at).toLocaleString()}`}>
-                        Updated: {new Date(item.updated_at).toLocaleDateString()}
-                      </span>
-                      {item.profiles && (
-                        <span className={`hidden sm:inline text-[10px] sm:text-xs ${colors.textSecondary} font-semibold`} title={`Written by: ${item.profiles.full_name || item.profiles.email}`}>
-                          By: {item.profiles.full_name || item.profiles.email?.split('@')[0]}
-                        </span>
-                      )}
                     </div>
                     
-                    <h3 className={`text-sm sm:text-lg font-bold mb-1 ${colors.text} truncate`} title={item.title}>
+                    <h3 className={`text-sm sm:text-lg font-bold mb-1 ${colors.text} sm:truncate line-clamp-2`} title={item.title}>
                       {item.title}
                     </h3>
                     
-                    <p className={`${colors.textSecondary} text-[11px] sm:text-sm line-clamp-2 sm:line-clamp-3 mb-1.5`}>
+                    <p className={`hidden sm:block ${colors.textSecondary} text-xs sm:text-sm line-clamp-2 sm:line-clamp-3 mb-1.5`}>
                       {item.description || (item.content ? item.content.replace(/<[^>]*>/g, '') : 'No description available')}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-2 mt-auto">
+                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-3 sm:mt-auto">
                     <div>
                       {item.youtube_link && (
                         <a
@@ -333,7 +346,7 @@ export function NewsClient({
                     <div className="flex gap-2">
                       <button
                         onClick={() => togglePublish(item)}
-                        className={`w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+                        className={`w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
                           item.is_published 
                             ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' 
                             : 'bg-green-50 text-green-700 hover:bg-green-100'
@@ -341,43 +354,43 @@ export function NewsClient({
                         title={item.is_published ? 'Unpublish' : 'Publish'}
                       >
                         {item.is_published ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 sm:w-4 sm:h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                           </svg>
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 sm:w-4 sm:h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
                           </svg>
                         )}
                       </button>
                       <button
                         onClick={() => togglePin(item)}
-                        className={`w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
+                        className={`w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg transition-colors duration-150 ${
                           item.is_pinned 
                             ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' 
                             : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                         }`}
                         title={item.is_pinned ? 'Unpin' : 'Pin'}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 sm:w-4 sm:h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                         </svg>
                       </button>
                       <Link
                         href={`/content/news/edit/${item.id}`}
-                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-150"
+                        className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-150"
                         title="Edit"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 sm:w-4 sm:h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                         </svg>
                       </Link>
                       <button
                         onClick={() => setDeleteItemId(item.id)}
-                        className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center bg-red-55 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-150"
+                        className="w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-150"
                         title="Delete"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 sm:w-4 sm:h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                         </svg>
                       </button>

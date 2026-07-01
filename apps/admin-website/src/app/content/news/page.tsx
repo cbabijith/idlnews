@@ -23,7 +23,7 @@ export default async function NewsPage() {
   const newsQuery = supabase
     .from('news')
     .select('*, categories(*), profiles(*)', { count: 'exact' })
-    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('published_at', { ascending: false, nullsFirst: true })
     .order('created_at', { ascending: false })
     .range(0, 9)
 

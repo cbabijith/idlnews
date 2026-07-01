@@ -33,6 +33,7 @@ export function NewsForm({
 }: NewsFormProps) {
   const { colors } = useThemeStore()
   const [uploading, setUploading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -145,9 +146,15 @@ export function NewsForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSubmit(formData)
-    if (!initialData) {
-      localStorage.removeItem('news-draft')
+    if (submitting) return
+    setSubmitting(true)
+    try {
+      await onSubmit(formData)
+      if (!initialData) {
+        localStorage.removeItem('news-draft')
+      }
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -291,15 +298,16 @@ export function NewsForm({
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <button
             type="submit"
-            className="w-full sm:w-auto px-6 py-3 bg-button text-white rounded-lg hover:opacity-90 font-medium text-center transition-all"
-            disabled={uploading}
+            className="w-full sm:w-auto px-6 py-3 bg-button text-white rounded-lg hover:opacity-90 font-medium text-center transition-all disabled:opacity-50"
+            disabled={uploading || submitting}
           >
-            {initialData ? 'Update' : 'Create'}
+            {submitting ? 'Saving...' : (initialData ? 'Update' : 'Create')}
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="w-full sm:w-auto px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-medium text-center transition-all"
+            className="w-full sm:w-auto px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 font-medium text-center transition-all disabled:opacity-50"
+            disabled={submitting}
           >
             Cancel
           </button>
