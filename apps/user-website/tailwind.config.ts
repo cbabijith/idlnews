@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'surface-tint': '#2563eb',
+        'surface-tint': '#06AFD8',
         'secondary-fixed-dim': '#e9c400',
         'surface-container-low': '#f0f9ff',
         'primary-fixed': '#bfdbfe',
@@ -25,7 +25,7 @@ const config: Config = {
         'on-tertiary-fixed-variant': '#474746',
         'on-secondary-fixed-variant': '#544600',
         'outline': '#8f7065',
-        'primary': '#2563eb',
+        'primary': '#06AFD8',
         'secondary': '#dc2626',
         'surface-container-high': '#e0f2fe',
         'error': '#ba1a1a',
@@ -51,13 +51,13 @@ const config: Config = {
         'primary-container': '#dbeafe',
         'inverse-on-surface': '#f0f1f2',
         'on-error': '#ffffff',
-        'on-primary-fixed-variant': '#1d4ed8',
+        'on-primary-fixed-variant': '#0592b3',
         'on-surface': '#191c1d',
         'on-tertiary-container': '#2c2b2b',
         'on-surface-variant': '#5b4137',
         'on-background': '#191c1d',
-        'button': '#2563eb',
-        'button-hover': '#1d4ed8',
+        'button': '#06AFD8',
+        'button-hover': '#0592b3',
       },
       borderRadius: {
         'DEFAULT': '0.125rem',
