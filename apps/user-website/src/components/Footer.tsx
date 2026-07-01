@@ -17,6 +17,31 @@ export function Footer() {
           <p className="text-white/60 text-[13px] leading-relaxed">
             സത്യസന്ധവും വേഗമേറിയതുമായ വാർത്തകൾ. കേരളത്തിലെയും ലോകത്തെയും പ്രധാന വാർത്തകൾ അതിവേഗം ലഭിക്കാൻ IDL NEWS.
           </p>
+          
+          {/* Contact Details */}
+          <div className="text-white/70 text-[12.5px] flex flex-col gap-1.5 mt-2 bg-white/5 p-4 rounded-xl border border-white/5">
+            <p className="font-semibold text-white">Chief Editor: Binu Karunakaran</p>
+            <p>Make over Building</p>
+            <p>Kalathilpady Ponpally road, Vadavathoor P.O</p>
+            <p>Kottayam - 686010</p>
+            <p className="flex items-center gap-1.5 text-white/80">
+              <span className="material-symbols-outlined text-[15px] text-primary">call</span>
+              Mobile: <a href="tel:9020333222" className="hover:underline text-white font-medium">9020333222</a>
+            </p>
+            <div className="flex items-center gap-3 mt-1.5 pt-1.5 border-t border-white/5 text-[11px] text-white/50">
+              <span>Since 2015</span>
+              <span>•</span>
+              <a 
+                href="https://maps.app.goo.gl/4Nz7YyCZq1ukGeL86" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary hover:text-white transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[13px]">location_on</span>
+                Google Maps
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Quick Links - Mobile-first grid */}
