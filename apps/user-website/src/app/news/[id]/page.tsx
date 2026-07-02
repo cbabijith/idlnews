@@ -119,12 +119,6 @@ export default function NewsDetailPage() {
 
     const category = news.categories?.name || 'ബ്രേക്കിംഗ് ന്യൂസ്'
 
-    const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim()
-    let description = news.description ? stripHtml(news.description) : (news.content ? stripHtml(news.content) : '')
-    if (description.length > 150) {
-      description = description.substring(0, 150).trim() + '...'
-    }
-
     const newsUrl = window.location.href
     const publishedDate = news.published_at
       ? new Date(news.published_at).toLocaleDateString('en-US', {
@@ -137,8 +131,6 @@ export default function NewsDetailPage() {
     const shareText = `📰 *IDL NEWS* | ${category}
 
 ✍️ *${news.title}*
-
-${description}
 
 👉 *മുഴുവൻ വാർത്ത വായിക്കാൻ:*
 ${newsUrl}
