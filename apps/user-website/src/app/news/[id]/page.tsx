@@ -304,10 +304,10 @@ https://chat.whatsapp.com/B6JGw1jqCMeFBABRYql9MV?mode=ems_copy_t
 
         {/* Featured Image */}
         {news.image_url && (
-          <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-surface-container mt-1">
+          <div className="w-full rounded-xl overflow-hidden bg-surface-container mt-1">
             <img
               alt={news.title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-[600px] object-contain"
               src={news.image_url}
             />
           </div>
